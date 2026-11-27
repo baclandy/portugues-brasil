@@ -415,7 +415,27 @@ details.week.current { border-color: var(--green); }
   // Shared database: Supabase REST API (table "progress", one row per person). Without config the site works locally only.
   const CFG = window.PT_CONFIG || {};
   const REMOTE = Boolean(CFG.supabaseUrl && CFG.supabaseKey);
-  const pending = { anton: false, yanina: false }, queued = { anton: false, yanina: false }, dirty = { anton: false, yanina: false };
+  const pending = { anton: false, yanina: false }, queued = { anton: false, yanina: false };
+
+  // Unsent changes per person: { "w3d2": "2026-12-01" (ticked) | null (unticked) }.
+  // The server copy is never replaced by this phone's full list: we read the server row, apply only these changes, then write.
+  let ops = { anton: {}, yanina: {} };
+  try { const s = JSON.parse(localStorage.getItem("pt-ops") || "null"); if (s && s.anton && s.yanina) ops = s; } catch (e) {}
+
+  function applyOps(base, o) {
+    const r = Object.assign({}, base);
+    Object.keys(o).forEach(k => { if (o[k] === null) delete r[k]; else r[k] = o[k]; });
+    return r;
+  }
+  function cleanDone(done) {
+    const out = {};
+    if (done && typeof done === "object") Object.keys(done).forEach(k => { if (/^w\d+d\d$/.test(k) && typeof done[k] === "string") out[k] = done[k]; });
+    return out;
+  }
+  function setDay(who, k, value) {
+    ops[who][k] = value;
+    state.done[who] = applyOps(state.done[who], { [k]: value });
+  }
 
   function api(path, opts) {
     return fetch(CFG.supabaseUrl.replace(/\/$/, "") + "/rest/v1/" + path, Object.assign({}, opts, {
@@ -424,19 +444,25 @@ details.week.current { border-color: var(--green); }
   }
 
   function saveLocal() {
-    try { localStorage.setItem("pt-done", JSON.stringify(state.done)); } catch (e) {}
+    try { localStorage.setItem("pt-done", JSON.stringify(state.done)); localStorage.setItem("pt-ops", JSON.stringify(ops)); } catch (e) {}
   }
 
+  // Send this person's unsent changes: read the server row first, merge, write. Never writes without a successful read.
   async function save(who) {
     saveLocal();
-    if (!REMOTE) return;
-    dirty[who] = true;
+    if (!REMOTE || !Object.keys(ops[who]).length) return;
     if (pending[who]) { queued[who] = true; return; }
     pending[who] = true;
+    const sent = Object.assign({}, ops[who]);
     try {
+      const rows = await (await api("progress?select=done&who=eq." + who)).json();
+      if (!Array.isArray(rows)) throw new Error("bad response");
+      const merged = applyOps(cleanDone(rows[0] && rows[0].done), sent);
       await api("progress", { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
-        body: JSON.stringify({ who, done: state.done[who], updated_at: new Date().toISOString() }) });
-      dirty[who] = false;
+        body: JSON.stringify({ who, done: merged, updated_at: new Date().toISOString() }) });
+      Object.keys(sent).forEach(k => { if (ops[who][k] === sent[k]) delete ops[who][k]; });
+      state.done[who] = applyOps(merged, ops[who]);
+      saveLocal(); render();
       setSync("Сохранено в общей базе — видно с любого телефона.");
     } catch (e) {
       setSync("Нет связи с базой. Отметка сохранена на телефоне и отправится, когда появится интернет.");
@@ -447,17 +473,11 @@ details.week.current { border-color: var(--green); }
 
   async function load() {
     if (!REMOTE) { setSync("База не подключена — прогресс хранится только на этом телефоне."); return; }
-    // Push changes that didn't reach the server yet before reading, so they are not overwritten.
-    for (const who of ["anton", "yanina"]) if (dirty[who] && !pending[who]) await save(who);
-    if (pending.anton || pending.yanina) return;
+    for (const who of ["anton", "yanina"]) if (Object.keys(ops[who]).length) save(who);
     try {
       const rows = await (await api("progress?select=who,done")).json();
       rows.forEach(r => {
-        if ((r.who === "anton" || r.who === "yanina") && r.done && typeof r.done === "object" && !dirty[r.who]) {
-          const clean = {};
-          Object.keys(r.done).forEach(k => { if (/^w\d+d\d$/.test(k) && typeof r.done[k] === "string") clean[k] = r.done[k]; });
-          state.done[r.who] = clean;
-        }
+        if (r.who === "anton" || r.who === "yanina") state.done[r.who] = applyOps(cleanDone(r.done), ops[r.who]);
       });
       saveLocal(); render();
       setSync("Прогресс в общей базе — открывайте с любого телефона.");
@@ -485,7 +505,7 @@ details.week.current { border-color: var(--green); }
 
   function toggle(wi, d, on) {
     const k = key(wi, d), who = state.who;
-    if (on) state.done[who][k] = todayISO(); else delete state.done[who][k];
+    setDay(who, k, on ? todayISO() : null);
     render(); save(who);
   }
 
@@ -774,7 +794,10 @@ details.week.current { border-color: var(--green); }
   $("backup-load").onclick = () => {
     const r = readCode($("backup-text").value);
     if (!r) { bMsg("Код не распознан. Вставьте его целиком, он начинается с PT1:"); return; }
-    state.done[r.who] = r.done; state.who = r.who; openWeeks = null;
+    // Restoring replaces this person's list on purpose: expressed as changes, so it goes through the same merge-safe save.
+    Object.keys(state.done[r.who]).forEach(k => { if (!(k in r.done)) setDay(r.who, k, null); });
+    Object.keys(r.done).forEach(k => setDay(r.who, k, r.done[k]));
+    state.who = r.who; openWeeks = null;
     try { localStorage.setItem("pt-who", r.who); } catch (e) {}
     save(r.who); render();
     bMsg("Прогресс восстановлен: " + (r.who === "anton" ? "Антон" : "Янина") + ", " + Object.keys(r.done).length + " занятий.");

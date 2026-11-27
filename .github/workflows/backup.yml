@@ -1,0 +1,44 @@
+# Daily read-only backup of the progress table into the "backups" branch.
+# It only reads the database (public anon key from config.js) and never writes to it.
+# The site is published from "main", so this branch does not affect the site.
+name: Backup progress
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download progress
+        run: |
+          URL=$(grep -o 'https://[a-z0-9]*\.supabase\.co' config.js)
+          KEY=$(grep -o 'sb_publishable_[A-Za-z0-9_-]*' config.js)
+          curl -sf "$URL/rest/v1/progress?select=who,done,updated_at&order=who" -H "apikey: $KEY" -o "$RUNNER_TEMP/progress.json"
+          python3 -c "import json,sys; d=json.load(open(sys.argv[1])); assert isinstance(d, list) and {r['who'] for r in d} >= {'anton','yanina'}, d" "$RUNNER_TEMP/progress.json"
+
+      - name: Save to backups branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin backups >/dev/null; then
+            git switch backups
+          else
+            git switch --orphan backups
+          fi
+          DAY=$(date -u +%F)
+          mkdir -p daily
+          cp "$RUNNER_TEMP/progress.json" latest.json
+          cp "$RUNNER_TEMP/progress.json" "daily/$DAY.json"
+          git add latest.json "daily/$DAY.json"
+          git diff --cached --quiet || git commit -m "chore: backup progress $DAY"
+          git push origin backups
