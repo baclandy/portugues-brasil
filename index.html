@@ -23,6 +23,8 @@
   --sun-soft: #FFF1D2;
   --pink: #E8739E;
   --pink-soft: #FDE8EF;
+  --terra: #C8694A;
+  --terra-soft: #F7E3D8;
   --blue: #3A6FC4;
   --ok: #2A9673;
   --bad: #D9534F;
@@ -33,12 +35,12 @@
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #131A2C; --sky: #1B2540; --surface: #1E2843; --fg: #EAF0FA; --muted: #9DA9C5; --line: #2D3958;
-  --green: #6FD3AE; --green-soft: #1E3A37; --sun: #F7C35C; --sun-soft: #3A321F; --pink: #F5A3C1; --pink-soft: #3B2536;
+  --green: #6FD3AE; --green-soft: #1E3A37; --sun: #F7C35C; --sun-soft: #3A321F; --pink: #F5A3C1; --pink-soft: #3B2536; --terra: #E39B7D; --terra-soft: #3A2821;
   --blue: #9DBBF0; --ok: #6FD3AE; --bad: #F08A84; --cloud: rgba(255, 255, 255, .05); --shadow: 0 6px 18px rgba(0, 0, 0, .25);
   color-scheme: dark } }
 :root[data-theme="dark"] {
   --bg: #131A2C; --sky: #1B2540; --surface: #1E2843; --fg: #EAF0FA; --muted: #9DA9C5; --line: #2D3958;
-  --green: #6FD3AE; --green-soft: #1E3A37; --sun: #F7C35C; --sun-soft: #3A321F; --pink: #F5A3C1; --pink-soft: #3B2536;
+  --green: #6FD3AE; --green-soft: #1E3A37; --sun: #F7C35C; --sun-soft: #3A321F; --pink: #F5A3C1; --pink-soft: #3B2536; --terra: #E39B7D; --terra-soft: #3A2821;
   --blue: #9DBBF0; --ok: #6FD3AE; --bad: #F08A84; --cloud: rgba(255, 255, 255, .05); --shadow: 0 6px 18px rgba(0, 0, 0, .25);
   color-scheme: dark }
 
@@ -125,7 +127,6 @@ details.week.current { border-color: var(--green); }
 .start { display: flex; flex-direction: column; gap: 22px; padding-top: 4vh; }
 .tiles { display: grid; grid-template-columns: 1fr; gap: 12px; }
 .tile { border: 2px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 18px; padding: 20px; text-align: left; display: flex; flex-direction: column; gap: 8px; }
-.tile:hover { border-color: var(--green); }
 .tile .name { font-family: var(--display); font-weight: 800; font-size: 28px; display: flex; justify-content: space-between; align-items: center; }
 .tile .name::after { content: "→"; color: var(--green); font-size: 24px; }
 .tile small { color: var(--muted); font-variant-numeric: tabular-nums; }
@@ -173,23 +174,24 @@ h1 { font-weight: 700; }
 h2 { font-weight: 600; }
 .eyebrow { font-weight: 800; }
 .bird { display: inline-block; flex: none; line-height: 0; }
-.bird svg { width: 100%; height: 100%; overflow: visible; }
+.bird svg { width: 100%; height: 100%; overflow: visible; pointer-events: none; }
 .flock { color: var(--muted); opacity: .55; width: 92px; height: 28px; }
 
-.tile { border-radius: 26px; box-shadow: var(--shadow); border-width: 2px; position: relative; padding: 18px 20px; flex-direction: row; align-items: center; gap: 24px; }
+.tile { touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer; border-radius: 26px; box-shadow: var(--shadow); border-width: 2px; position: relative; padding: 18px 20px; flex-direction: row; align-items: center; gap: 24px; }
 .tile .info { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 0; }
 .tile .name { font-weight: 600; }
 .tile .bird { width: 76px; height: 76px; transition: transform .25s; }
-.tile:hover .bird, .tile:focus-visible .bird { transform: translateY(-4px) rotate(-6deg); }
+@media (hover: hover) and (pointer: fine) { .tile:hover .bird { transform: translateY(-4px) rotate(-6deg); } .tile:hover .bird .wing:not(.fast) { animation-duration: .5s; } }
+.tile:focus-visible .bird { transform: translateY(-4px) rotate(-6deg); }
 .tile.t-anton { background: var(--green-soft); border-color: transparent; }
-.tile.t-yanina { background: var(--pink-soft); border-color: transparent; }
+.tile.t-yanina { background: var(--terra-soft); border-color: transparent; }
 .tile.together { border-color: transparent; }
 .tile .name::after { content: none; }
 .tile .bird-name { font-size: 13px; color: var(--muted); }
 
 .bar { height: 10px; border-radius: 10px; background: var(--surface); overflow: visible; position: relative; margin: 6px 0 4px; }
 .bar i { background: linear-gradient(90deg, var(--green), var(--sun)); border-radius: 10px; }
-.t-yanina .bar i { background: linear-gradient(90deg, var(--pink), var(--sun)); }
+.t-yanina .bar i { background: linear-gradient(90deg, var(--terra), #F2B48F); }
 .bar .mini { position: absolute; top: -15px; width: 26px; height: 26px; margin-left: -4px; left: 0; transition: left .4s; }
 
 .dayfact { background: var(--surface); border-radius: 22px; padding: 14px 16px; box-shadow: var(--shadow); display: flex; gap: 14px; align-items: center; }
@@ -222,6 +224,15 @@ details.week.current { border-color: var(--pink); }
 @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
 .bob { animation: bob 2.4s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .bob { animation: none; } .toast, .tile .bird, .bar .mini { transition: none; } }
+
+/* wings: a cute double flap every few seconds; hummingbird buzzes non-stop */
+.bird .wing { transform-box: fill-box; transform-origin: 85% 25%; animation: flap 2.4s ease-in-out infinite; }
+.bird .wing.fast { animation: buzz .18s linear infinite; }
+.bird .flap { transform-box: fill-box; transform-origin: 50% 100%; animation: flock 1s ease-in-out infinite; }
+@keyframes flap { 0%, 62%, 100% { transform: rotate(0); } 70% { transform: rotate(-34deg); } 78% { transform: rotate(4deg); } 86% { transform: rotate(-34deg); } 94% { transform: rotate(0); } }
+@keyframes buzz { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-40deg); } }
+@keyframes flock { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(.35); } }
+@media (prefers-reduced-motion: reduce) { .bird .wing, .bird .wing.fast, .bird .flap { animation: none; } }
 </style>
 </head>
 <body>
@@ -608,12 +619,13 @@ details.week.current { border-color: var(--pink); }
     periquito: { body: "#7AD07A", head: "#FFB27A", belly: "#BDEBA4", wing: "#57B05A", beak: "hook", beakColor: "#F2764B" },
     periquita: { body: "#7AD07A", head: "#FF94B4", belly: "#BDEBA4", wing: "#57B05A", beak: "hook", beakColor: "#F2764B" }
   };
+  let wingSeed = 0; // spreads flaps in time so birds don't flap in sync
   function birdParts(s) {
     let g = '<path d="M42 84 L40 93 M54 84 L55 93" stroke="#F2A93B" stroke-width="3.5" stroke-linecap="round" fill="none"/>' +
       '<path d="M24 60 L3 71 L10 57 L3 45 Z" fill="' + s.wing + '"/>' +
       '<ellipse cx="46" cy="60" rx="30" ry="26" fill="' + s.body + '"/>' +
       '<ellipse cx="55" cy="68" rx="18" ry="14" fill="' + s.belly + '"/>' +
-      '<ellipse cx="39" cy="61" rx="16" ry="11" transform="rotate(-18 39 61)" fill="' + s.wing + '"/>' +
+      '<g class="wing' + (s.beak === "long" ? " fast" : "") + '" style="animation-delay:-' + ((wingSeed++ * 0.73) % 2.4).toFixed(2) + 's"><ellipse cx="39" cy="61" rx="16" ry="11" transform="rotate(-18 39 61)" fill="' + s.wing + '"/></g>' +
       '<circle cx="62" cy="40" r="20" fill="' + s.head + '"/>';
     if (s.throat) g += '<ellipse cx="70" cy="53" rx="8" ry="5" fill="' + s.throat + '"/>';
     if (s.brow) g += '<path d="M48 35 Q62 27 80 34" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round" fill="none"/>';
@@ -630,7 +642,7 @@ details.week.current { border-color: var(--pink); }
     if (kind === "casal") return '<svg viewBox="0 0 170 100" aria-hidden="true"><g transform="translate(2 8) scale(.88)">' + birdParts(BIRD_SPECS.periquito) +
       '</g><g transform="translate(168 8) scale(-.88 .88)">' + birdParts(BIRD_SPECS.periquita) +
       '</g><path d="M85 30 C85 24 77 22 77 29 C77 34 85 38 85 38 C85 38 93 34 93 29 C93 22 85 24 85 30 Z" fill="#FF6F9C"/></svg>';
-    if (kind === "flock") return '<svg viewBox="0 0 92 28" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 14 Q10 7 16 14 Q22 7 28 14"/><path d="M36 22 Q41 16 46 22 Q51 16 56 22"/><path d="M62 8 Q67 2 72 8 Q77 2 82 8"/></svg>';
+    if (kind === "flock") return '<svg viewBox="0 0 92 28" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path class="flap" d="M4 14 Q10 7 16 14 Q22 7 28 14"/><path class="flap" style="animation-delay:-.3s" d="M36 22 Q41 16 46 22 Q51 16 56 22"/><path class="flap" style="animation-delay:-.6s" d="M62 8 Q67 2 72 8 Q77 2 82 8"/></svg>';
     return '<svg viewBox="0 0 100 100" aria-hidden="true">' + birdParts(BIRD_SPECS[kind] || BIRD_SPECS.sabia) + '</svg>';
   }
   function paintBirds() {
@@ -902,8 +914,10 @@ details.week.current { border-color: var(--pink); }
   });
 
   // ---------- views: start / person / together ----------
-  function route() {
-    const h = location.hash.replace("#", "");
+  // Views don't depend on the browser accepting a hash change (some in-app browsers block it):
+  // the target is shown directly, the address is updated only as a bonus for the Back button.
+  function route(target) {
+    const h = typeof target === "string" ? target : location.hash.replace("#", "");
     const view = h === "anton" || h === "yanina" ? "person" : h === "vmeste" ? "together" : "start";
     if (view === "person" && state.who !== h) { state.who = h; openWeeks = null; }
     if (view !== "together") { stopTimer(); G.game = null; }
@@ -911,15 +925,20 @@ details.week.current { border-color: var(--pink); }
     render();
     window.scrollTo(0, 0);
   }
-  window.addEventListener("hashchange", route);
+  window.addEventListener("hashchange", () => route());
+  window.addEventListener("popstate", () => route());
+  function go(target) {
+    try { if (location.hash.replace("#", "") !== target) history.pushState(null, "", target ? "#" + target : location.pathname + location.search); } catch (e) {}
+    route(target);
+  }
 
   function render() { renderWho(); renderToday(); renderPlan(); if (!$("view-together").hidden && !G.game) renderTogether(); paintBirds(); }
   renderDayFact();
 
   // ---------- events ----------
   document.addEventListener("click", e => {
-    const go = e.target.closest("[data-go]");
-    if (go) { location.hash = go.dataset.go; if (!go.dataset.go) route(); return; }
+    const btn = e.target.closest("[data-go]");
+    if (btn) { e.preventDefault(); go(btn.dataset.go); return; }
     const b = e.target.closest("[data-say]"); if (b) speak(b.dataset.say);
   });
   document.querySelectorAll('[role="tab"]').forEach(t => t.onclick = () => {
