@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Português para o Brasil</title>
+<script src="config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: one narrow column like a study notebook; profile switch on top, today's 20 minutes first, full 48-week plan below */
+:root {
+  --bg: #F3F6F1;
+  --surface: #FFFFFF;
+  --fg: #16241E;
+  --muted: #5B6B63;
+  --line: #DCE4DD;
+  --green: #1E6B4E;
+  --green-soft: #E2EFE8;
+  --sun: #E3A72F;
+  --sun-soft: #FBF0D6;
+  --blue: #23508F;
+  --ok: #1E6B4E;
+  --display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0E1714; --surface: #16221D; --fg: #E5EDE8; --muted: #93A69C; --line: #26362F;
+  --green: #5EC197; --green-soft: #1A3329; --sun: #E9B54A; --sun-soft: #33291A; --blue: #8DB4EC; --ok: #5EC197;
+  color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0E1714; --surface: #16221D; --fg: #E5EDE8; --muted: #93A69C; --line: #26362F;
+  --green: #5EC197; --green-soft: #1A3329; --sun: #E9B54A; --sun-soft: #33291A; --blue: #8DB4EC; --ok: #5EC197;
+  color-scheme: dark }
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+img { max-width: 100%; }
+html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.55; }
+.wrap { max-width: 760px; margin: 0 auto; padding-block: 20px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 22px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: clamp(28px, 6vw, 40px); font-weight: 800; letter-spacing: -0.01em; }
+h2 { font-size: 22px; font-weight: 800; }
+h3 { font-size: 17px; font-weight: 600; }
+p { margin: 0; }
+a { color: var(--blue); }
+.muted { color: var(--muted); }
+.eyebrow { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+button { font: inherit; cursor: pointer; }
+button:focus-visible, summary:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+
+header { display: flex; flex-direction: column; gap: 6px; }
+.who { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.who button { border: 2px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 14px; padding: 12px 14px; text-align: left; display: flex; flex-direction: column; gap: 6px; }
+.who button[aria-pressed="true"] { border-color: var(--green); background: var(--green-soft); }
+.who .name { font-family: var(--display); font-weight: 800; font-size: 20px; }
+.bar { height: 6px; border-radius: 6px; background: var(--line); overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--green); border-radius: 6px; width: 0; transition: width .4s; }
+.who small { color: var(--muted); font-variant-numeric: tabular-nums; }
+.sync { font-size: 12px; color: var(--muted); }
+
+.today { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.today-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; }
+.streak { background: var(--sun-soft); color: var(--fg); border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.steps { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.steps li { display: grid; grid-template-columns: 52px 1fr; gap: 12px; align-items: start; }
+.steps .min { font-family: var(--display); font-weight: 800; color: var(--green); font-size: 18px; font-variant-numeric: tabular-nums; }
+.steps .min span { font-size: 11px; font-weight: 600; display: block; color: var(--muted); font-family: var(--body); }
+.words { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.word { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; min-width: 0; }
+.word b { font-weight: 600; display: block; }
+.word div { min-width: 0; }
+.word small { color: var(--muted); }
+.say { flex: none; width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line); background: var(--green-soft); color: var(--green); display: grid; place-items: center; }
+.say svg { width: 16px; height: 16px; }
+.done-btn { align-self: flex-start; border: 0; border-radius: 12px; padding: 12px 20px; background: var(--green); color: var(--bg); font-weight: 600; font-size: 16px; }
+.done-btn.is-done { background: var(--green-soft); color: var(--green); }
+.tip { background: var(--sun-soft); border-radius: 12px; padding: 12px 14px; font-size: 14px; }
+
+.phase { display: flex; flex-direction: column; gap: 8px; }
+.phase-head { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline; padding-top: 6px; }
+.lvl { font-size: 12px; font-weight: 600; border: 1px solid var(--green); color: var(--green); border-radius: 999px; padding: 1px 9px; }
+details.week { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+details.week > summary { list-style: none; display: grid; grid-template-columns: 44px 1fr auto; gap: 10px; align-items: center; padding: 10px 14px; cursor: pointer; }
+details.week > summary::-webkit-details-marker { display: none; }
+.wnum { font-family: var(--display); font-weight: 800; color: var(--muted); font-variant-numeric: tabular-nums; }
+.wtitle { min-width: 0; }
+.dots { display: flex; gap: 3px; }
+.dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+.dots i.on { background: var(--green); }
+details.week.current { border-color: var(--green); }
+.wbody { padding: 0 14px 14px; display: flex; flex-direction: column; gap: 10px; }
+.day { display: flex; gap: 10px; align-items: flex-start; }
+.day input { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--green); flex: none; }
+.day label { cursor: pointer; }
+
+.info { display: grid; gap: 14px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+.card ul, .card ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+.timeline { display: flex; flex-direction: column; gap: 0; }
+.tl { display: grid; grid-template-columns: 16px 1fr; gap: 12px; }
+.tl .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--green); margin-top: 6px; position: relative; }
+.tl:not(:last-child) .dot::after { content: ""; position: absolute; left: 5px; top: 12px; width: 2px; height: 60px; background: var(--line); }
+.tl > div:last-child { padding-bottom: 14px; }
+.levels { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; font-size: 13px; }
+.levels div { border: 1px solid var(--line); border-radius: 8px; padding: 8px; }
+.levels div.goal { border-color: var(--sun); background: var(--sun-soft); }
+@media (max-width: 520px) { .levels { grid-template-columns: 1fr 1fr; } }
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.tabs button { border: 1px solid var(--line); background: transparent; color: var(--fg); border-radius: 999px; padding: 6px 14px; }
+.tabs button[aria-selected="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+@media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="eyebrow">20 минут в день · 48 недель · до CELPE-Bras</span>
+    <h1>Português para o Brasil</h1>
+    <p class="muted">Бразильский португальский для жизни в Бразилии, роддома, документов и экзамена на гражданство.</p>
+  </header>
+
+  <div class="who" id="who">
+    <button type="button" id="btn-anton" data-who="anton" aria-pressed="false"><span class="name">Антон</span><span class="bar"><i></i></span><small>0 из 288 занятий</small></button>
+    <button type="button" id="btn-yanina" data-who="yanina" aria-pressed="false"><span class="name">Янина</span><span class="bar"><i></i></span><small>0 из 288 занятий</small></button>
+  </div>
+  <p class="sync" id="sync">Загружаю прогресс…</p>
+
+  <section class="today" id="today" aria-live="polite"></section>
+
+  <nav class="tabs" role="tablist">
+    <button type="button" id="tab-plan" role="tab" aria-selected="true" data-tab="plan">План по неделям</button>
+    <button type="button" id="tab-exam" role="tab" aria-selected="false" data-tab="exam">Экзамен и гражданство</button>
+    <button type="button" id="tab-how" role="tab" aria-selected="false" data-tab="how">Как заниматься</button>
+  </nav>
+
+  <section id="pane-plan"></section>
+
+  <section id="pane-exam" class="info" hidden>
+    <div class="card">
+      <h2>Путь к гражданству</h2>
+      <p class="muted">Общая схема по закону о миграции Бразилии (Lei 13.445/2017). Правила меняются — перед поездкой проверьте у бразильского иммиграционного юриста.</p>
+      <div class="timeline">
+        <div class="tl"><span class="dot"></span><div><h3>Роды в Бразилии</h3><p>Ребёнок, рождённый в Бразилии, — бразилец по рождению. Получаете в роддоме справку DNV, затем в cartório — certidão de nascimento.</p></div></div>
+        <div class="tl"><span class="dot"></span><div><h3>Вид на жительство родителям</h3><p>Подаётесь в Polícia Federal на residência по «воссоединению семьи» (reunião familiar) с ребёнком-бразильцем. Получаете карту RNM.</p></div></div>
+        <div class="tl"><span class="dot"></span><div><h3>1 год жизни в Бразилии</h3><p>Обычно для натурализации нужно 4 года, но если у вас ребёнок-бразилец, срок сокращается до 1 года. То есть «несколько лет» скорее всего не нужно.</p></div></div>
+        <div class="tl"><span class="dot"></span><div><h3>Сертификат CELPE-Bras</h3><p>Главный способ доказать знание португальского. Подходит любой уровень сертификата, начиная с Intermediário. Сдать можно и до переезда.</p></div></div>
+        <div class="tl"><span class="dot"></span><div><h3>Заявление на натурализацию</h3><p>Онлайн через gov.br + справки об отсутствии судимости. Каждый из вас подаётся отдельно, поэтому язык нужен обоим.</p></div></div>
+      </div>
+      <p class="tip">В последние годы бразильские власти внимательнее проверяют случаи «приехали только родить». Готовьте честную историю и документы, а язык сильно помогает и на границе, и в Polícia Federal.</p>
+    </div>
+    <div class="card">
+      <h2>Как устроен CELPE-Bras</h2>
+      <p>Экзамен проводит INEP, обычно два раза в год. Он «интегрированный»: нет тестов с вариантами ответа и отдельной грамматики. Вы смотрите, слушаете и читаете, а потом пишете текст нужного жанра для конкретного адресата.</p>
+      <ul>
+        <li><b>Письменная часть, 3 часа, 4 задания.</b> 1 — видео, 2 — аудио, 3 и 4 — тексты. В каждом нужно написать письмо, статью, e-mail или текст для сайта, используя услышанное.</li>
+        <li><b>Устная часть, 20 минут.</b> 5 минут разговор о вас по анкете, которую вы заполняете при регистрации. Потом 15 минут обсуждения трёх «elementos provocadores»: картинка или короткий текст.</li>
+        <li><b>Оценивают</b>: выполнили ли задание (адресат, цель, жанр), связность текста и уместность языка. Ошибки в грамматике прощают, если текст работает.</li>
+        <li>Есть экзаменационные центры и за пределами Бразилии. Актуальный список, даты и стоимость — на gov.br/inep.</li>
+      </ul>
+      <div class="levels">
+        <div class="goal"><b>Intermediário</b><br><small>хватает для гражданства</small></div>
+        <div><b>Intermediário Superior</b></div>
+        <div><b>Avançado</b></div>
+        <div><b>Avançado Superior</b></div>
+      </div>
+      <p class="muted">Все прошлые задания с видео и аудио бесплатно лежат в «Acervo Celpe-Bras» (сайт UFRGS) — это главный материал для 5-й фазы плана.</p>
+    </div>
+  </section>
+
+  <section id="pane-how" class="info" hidden>
+    <div class="card">
+      <h2>Почему план устроен именно так</h2>
+      <ul>
+        <li><b>Только бразильский вариант.</b> Европейский португальский звучит иначе. Многие ресурсы (например, Practice Portuguese) — про Португалию, их пропускаем.</li>
+        <li><b>Сначала то, что нужно в первые месяцы</b>: магазин, Uber, аренда, Pix, а потом врачи, роддом, cartório и Polícia Federal. Эти слова вы будете использовать каждый день.</li>
+        <li><b>Экзамен — в конце.</b> CELPE-Bras проверяет умение понять видео и написать нормальное письмо, а не зубрёжку. Поэтому последние 10 недель — только формат экзамена.</li>
+        <li><b>Суббота вдвоём.</b> Главная проблема тех, кто учит сам, — не говорят вслух. Вы двое — готовые партнёры по разговору.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>Резервная копия прогресса</h2>
+      <p>Прогресс хранится в общей базе, поэтому обычно эта функция не нужна. Код пригодится, если база будет недоступна или вы захотите перенести прогресс вручную.</p>
+      <div class="tabs">
+        <button type="button" id="backup-copy">Скопировать мой код</button>
+        <button type="button" id="backup-load">Восстановить из кода</button>
+      </div>
+      <label for="backup-text" class="muted">Код прогресса</label>
+      <textarea id="backup-text" rows="3" placeholder="Вставьте сюда код, который начинается с PT1:" style="width:100%;font:inherit;font-size:13px;border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--bg);color:var(--fg);"></textarea>
+      <p class="muted" id="backup-msg" aria-live="polite"></p>
+    </div>
+    <div class="card">
+      <h2>Одно занятие = 20 минут</h2>
+      <ol>
+        <li><b>5 минут — карточки Anki.</b> Бесплатное приложение с повторением слов. Добавляйте туда 6 слов недели.</li>
+        <li><b>10 минут — главное задание дня.</b> Урок, видео, текст или письмо.</li>
+        <li><b>5 минут — вслух.</b> Повторять за диктором, проговаривать свои фразы, записывать себя на диктофон.</li>
+      </ol>
+      <p class="muted">Пн–Пт — сами, суббота — вместе, воскресенье — отдых или догнать пропущенное. Пропустили день — не страшно, просто продолжайте со следующего занятия.</p>
+    </div>
+    <div class="card">
+      <h2>Честно про темп</h2>
+      <p>20 минут × 6 дней × 48 недель ≈ 100 часов. Этого хватит, чтобы спокойно жить и решать бытовые дела (уровень A2–B1). Для уверенного Intermediário на CELPE-Bras обычно нужно больше. Дальше добирает погружение: в Бразилии вы будете слышать язык весь день. А за 2–3 месяца до экзамена стоит увеличить занятия до 40 минут или взять онлайн-преподавателя для интервью.</p>
+    </div>
+    <div class="card">
+      <h2>Бесплатные материалы</h2>
+      <ul>
+        <li><b>Anki</b> — карточки для слов.</li>
+        <li><b>Speaking Brazilian</b> (YouTube) — произношение и разговорная речь.</li>
+        <li><b>Easy Portuguese</b> (YouTube) — уличные интервью в Бразилии с субтитрами.</li>
+        <li><b>Portuguese With Carla</b> — подкаст и видео для начинающих и среднего уровня.</li>
+        <li><b>Tá Falado</b> — подкаст с текстами, хорош для разбора произношения.</li>
+        <li><b>G1</b>, <b>Jornal Nacional</b> — новости с 4-й фазы.</li>
+        <li><b>Acervo Celpe-Bras</b> — все прошлые экзамены.</li>
+        <li>Сериалы с субтитрами на португальском: «Cidade Invisível», «Sintonia», комиксы «Turma da Mônica» для чтения.</li>
+      </ul>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const PHASES = [
+    { name: "Звуки и выживание", lvl: "A1", weeks: [1, 8],
+      listen: "Speaking Brazilian (YouTube): видео по теме недели",
+      read: "простой диалог по теме (Duolingo или урок на YouTube)" },
+    { name: "Быт в Бразилии", lvl: "A2", weeks: [9, 18],
+      listen: "Easy Portuguese (YouTube): уличное интервью с субтитрами",
+      read: "эпизод Tá Falado: прочитать текст диалога" },
+    { name: "Беременность, врачи, документы", lvl: "A2+", weeks: [19, 28],
+      listen: "Portuguese With Carla: эпизод подкаста",
+      read: "страница gov.br или Ministério da Saúde по теме недели" },
+    { name: "Жизнь и общение", lvl: "B1", weeks: [29, 38],
+      listen: "5 минут Jornal Nacional или подкаста о Бразилии",
+      read: "одна короткая новость на G1" },
+    { name: "Формат CELPE-Bras", lvl: "B1+", weeks: [39, 48],
+      listen: "видео или аудио из Acervo Celpe-Bras",
+      read: "текст из прошлого экзамена в Acervo Celpe-Bras" }
+  ];
+
+  // [title, grammar/focus, youtube query, words "pt=ru;...", writing task, together task]
+  const W = [
+    ["Звуки бразильского", "Алфавит, носовые ã/õ, «te/de» звучат как «чи/джи», «r» в начале как «х»", "brazilian portuguese pronunciation for beginners", "olá=привет;tchau=пока;obrigado / obrigada=спасибо (говорит м / ж);por favor=пожалуйста;desculpa=извините;tudo bem?=как дела?", "Напишите 3 фразы: поздороваться, назвать имя, попрощаться", "Поздоровайтесь и попрощайтесь 10 раз разными способами, следите за «чи/джи»"],
+    ["Знакомство", "Местоимения; «a gente» = «мы» в разговорной речи; Meu nome é…, Sou da Rússia", "brazilian portuguese introduce yourself", "eu=я;você=ты / вы;a gente=мы (разг.);ele / ela=он / она;nome=имя;de onde?=откуда?", "Напишите о себе 5 предложений: имя, откуда, где живёте", "Познакомьтесь «впервые»: один — бразилец на пляже, другой — турист"],
+    ["Числа и деньги", "Числа 0–100; um/uma, dois/duas; цены в реалах", "brazilian portuguese numbers 1-100", "um / uma=один / одна;dois / duas=два / две;dez=десять;vinte=двадцать;quanto custa?=сколько стоит?;real / reais=реал / реалы", "Напишите цифрами и словами цены 5 продуктов", "Игра «рынок»: один продаёт фрукты, другой торгуется, называя цены"],
+    ["Ser и estar", "Два глагола «быть»: ser — постоянное, estar — состояние сейчас", "ser vs estar brazilian portuguese", "ser=быть (постоянно);estar=быть (сейчас);cansado=уставший;grávida=беременная;feliz=счастливый;aqui=здесь", "5 предложений о себе: 3 с ser, 2 с estar", "Расскажите друг другу, как вы себя чувствуете сегодня и какие вы по характеру"],
+    ["Артикли и род", "o/a/os/as, um/uma; слова мужского и женского рода", "brazilian portuguese articles gender", "casa=дом;água=вода;mercado=магазин;farmácia=аптека;banheiro=туалет;rua=улица", "Опишите 5 мест рядом с вашим домом: «Tem uma farmácia na rua…»", "Спрашивайте дорогу: «Onde fica o banheiro?» — и отвечайте"],
+    ["Глаголы на -ar", "Настоящее время: falo, fala, falamos, falam", "brazilian portuguese present tense ar verbs", "falar=говорить;morar=жить;trabalhar=работать;gostar de=любить, нравиться;precisar de=нуждаться;estudar=учиться", "Напишите 6 предложений про ваш обычный день", "Интервью: где живёшь, где работаешь, что любишь — по очереди"],
+    ["Кафе и еда", "Eu queria… (вежливо «я бы хотел»), глаголы querer и ter", "ordering food in brazilian portuguese", "eu queria=я бы хотел;a conta=счёт;pão de queijo=сырная булочка;feijão=фасоль;frango=курица;suco=сок", "Напишите заказ в кафе на двоих", "Ролевая игра: официант и клиент в padaria, закажите завтрак"],
+    ["Время и повторение", "Que horas são? Дни недели. Повторяем фазу 1", "telling time brazilian portuguese", "hoje=сегодня;amanhã=завтра;ontem=вчера;segunda-feira=понедельник;de manhã=утром;à noite=вечером", "Распишите свою неделю по дням на португальском", "Договоритесь о встрече: день, время, место. Затем перенесите её"],
+
+    ["Глаголы на -er/-ir", "comer, beber, abrir, entender; как переспросить", "brazilian portuguese er ir verbs present", "comer=есть;beber=пить;entender=понимать;não entendi=я не понял;pode repetir?=можете повторить?;mais devagar=помедленнее", "5 фраз, чтобы переспросить и уточнить", "Один говорит быстро, другой переспрашивает всеми фразами недели"],
+    ["Супермаркет и Pix", "este/esse/aquele — этот/тот; оплата в Бразилии", "supermarket vocabulary brazilian portuguese", "sacola=пакет;caixa=касса;cartão=карта;Pix=мгновенный перевод;troco=сдача;quilo=килограмм", "Список покупок на неделю на португальском", "Сцена на кассе: «Débito ou crédito?», «Quer sacola?», оплата по Pix"],
+    ["Транспорт и Uber", "ir/vir; будущее через «vou + глагол»", "transportation brazilian portuguese", "ônibus=автобус;ponto=остановка;motorista=водитель;corrida=поездка (такси);perto=близко;longe=далеко", "Напишите сообщение водителю Uber: где вы стоите и как вас найти", "Таксист и пассажир: адрес, маршрут, пробки, разговор о погоде"],
+    ["Квартира и аренда", "tem/há — «есть»; предлоги места", "renting an apartment in brazil portuguese", "aluguel=аренда;quarto=комната;fiador=поручитель;condomínio=плата за дом;vizinho=сосед;chave=ключ", "Объявление: какую квартиру вы ищете (район, комнаты, цена)", "Звонок риелтору: спросить про цену, condomínio, мебель, залог"],
+    ["Прошедшее время (-ar)", "Pretérito perfeito: falei, falou, falamos", "pretérito perfeito brazilian portuguese", "comprei=я купил;cheguei=я пришёл;chegamos=мы приехали;já=уже;ainda não=ещё нет;semana passada=на прошлой неделе", "Что вы сделали вчера — 6 предложений", "Расскажите друг другу о прошлых выходных, задавайте вопросы"],
+    ["Неправильное прошедшее", "fui, fiz, tive, estive, pude, disse, vi", "irregular past tense brazilian portuguese", "fui=я был / ходил;fiz=я сделал;tive=у меня было;pude=я смог;disse=я сказал;vi=я видел", "Опишите ваше лучшее путешествие", "Игра «две правды и одна ложь» о прошлом"],
+    ["Погода и одежда", "Fazer calor, estar chovendo; что брать в бразильский климат", "weather vocabulary brazilian portuguese", "calor=жара;chuva=дождь;protetor solar=солнцезащитный крем;chinelo=шлёпанцы;guarda-chuva=зонт;abafado=душно", "Опишите погоду там, где вы сейчас, и что вы надели", "Собираете чемодан в Бразилию: спорите, что взять"],
+    ["Банк, связь, CPF", "Вопросы с «Como faço para…?» (как мне…?)", "opening bank account brazil portuguese", "CPF=налоговый номер;conta=счёт в банке;chip=сим-карта;senha=пароль;boleto=квитанция на оплату;atendente=оператор", "Напишите вопросы для покупки сим-карты", "Вы в банке: открываете счёт, оператор просит документы"],
+    ["Безопасность и город", "Повелительное наклонение для просьб и предупреждений", "imperative brazilian portuguese", "cuidado!=осторожно!;socorro!=помогите!;celular=телефон;bairro=район;assalto=ограбление;polícia=полиция", "5 советов о безопасности для новичка в Бразилии", "Один «местный», другой новичок: какие районы, как ходить вечером"],
+    ["Разговорный бразильский", "né, tá, beleza, valeu; повторение фазы 2", "brazilian portuguese slang everyday", "né?=да? / правда?;tá=ок (от está);beleza=отлично, ок;valeu=спасибо (разг.);cara=чувак;legal=классно", "Перепишите формальный диалог разговорным языком", "Говорите 20 минут только по-португальски о чём угодно, используя сленг"],
+
+    ["Тело и самочувствие", "Estou com dor de…, sinto…", "body parts and symptoms brazilian portuguese", "dor=боль;cabeça=голова;barriga=живот;enjoo=тошнота;febre=температура;tontura=головокружение", "Опишите симптомы для врача (выдуманные)", "Врач и пациент: где болит, с какого времени, что принимали"],
+    ["Запись к врачу", "Marcar consulta; SUS и частная страховка", "doctor appointment brazilian portuguese", "consulta=приём;marcar=записаться;plano de saúde=медстраховка;SUS=гос. медицина;posto de saúde=поликлиника;pronto-socorro=неотложка", "Сообщение в WhatsApp клинике: записаться на приём", "Звонок в клинику: записаться, перенести, спросить про страховку"],
+    ["Ведение беременности", "Pré-natal: анализы, УЗИ, недели беременности", "pré-natal vocabulário", "pré-natal=ведение беременности;exame de sangue=анализ крови;ultrassom=УЗИ;obstetra=акушер-гинеколог;semanas=недели;cartão da gestante=карта беременной", "Список вопросов к obstetra на первом приёме", "Приём у obstetra: срок, самочувствие, какие анализы сдать"],
+    ["Роды", "Будущее время для планов; как описать схватки", "parto vocabulário português", "parto normal=естественные роды;cesárea=кесарево;maternidade=роддом;contração=схватка;a bolsa estourou=отошли воды;acompanhante=сопровождающий", "Ваш план родов: 6 предложений", "Репетиция: приезд в роддом, Антон объясняет ситуацию на ресепшене"],
+    ["Аптека и рецепты", "Дозировки: de 8 em 8 horas, antes/depois de comer", "pharmacy vocabulary brazilian portuguese", "receita=рецепт;remédio=лекарство;comprimido=таблетка;de oito em oito horas=каждые 8 часов;alergia=аллергия;vitamina=витамин", "Инструкция к лекарству своими словами", "Фармацевт и покупатель: что от тошноты, можно ли беременным"],
+    ["Новорождённый", "Слова ухода за малышом; притяжательные meu/minha/nosso", "newborn baby vocabulary portuguese", "bebê=малыш;fralda=подгузник;amamentar=кормить грудью;vacina=прививка;pediatra=педиатр;teste do pezinho=скрининг новорождённых", "Список покупок для малыша", "Визит к pediatra: вес, сон, кормление, прививки"],
+    ["Регистрация ребёнка", "Cartório, certidão de nascimento — что сказать и принести", "registro de nascimento cartório", "cartório=ЗАГС / нотариус;certidão de nascimento=свидетельство о рождении;registrar=зарегистрировать;DNV=справка из роддома;sobrenome=фамилия;nacionalidade=гражданство", "Заполните (выдуманную) анкету для регистрации ребёнка", "В cartório: сотрудник задаёт вопросы, вы отвечаете и уточняете фамилию"],
+    ["Polícia Federal и ВНЖ", "Агендамент, документы, вид на жительство", "residência reunião familiar polícia federal", "Polícia Federal=миграционная служба;agendamento=запись;residência=вид на жительство;RNM=карта иностранца;reunião familiar=воссоединение семьи;documentos=документы", "Список документов для ВНЖ на португальском", "Приём в Polícia Federal: зачем приехали, где живёте, какие документы"],
+    ["Вежливая речь и письма", "o senhor / a senhora, gostaria de…, формальный e-mail", "formal email in portuguese", "o senhor / a senhora=вы (вежливо);gostaria de=я хотел бы;prezado=уважаемый;atenciosamente=с уважением;solicitar=запросить;prazo=срок", "Формальное письмо: попросить перенести запись", "Каждый пишет письмо, другой отвечает от лица учреждения"],
+    ["Документы: повторение", "Ролевые игры фазы 3 — больница и госорганы", "brazilian bureaucracy vocabulary", "formulário=анкета;assinatura=подпись;comprovante de residência=подтверждение адреса;cópia autenticada=заверенная копия;fila=очередь;senha=номерок в очереди", "Опишите, как прошёл бы ваш день в госорганах", "Марафон: врач → аптека → cartório, по 6–7 минут каждая сцена"],
+
+    ["Imperfeito: привычки", "Morava, fazia, era — как было раньше", "imperfeito brazilian portuguese", "eu morava=я жил (раньше);quando era criança=когда был ребёнком;sempre=всегда;costumava=обычно (делал);antigamente=раньше;infância=детство", "Ваше детство: 8 предложений", "Расскажите друг другу о детстве, задайте по 5 вопросов"],
+    ["Рассказ истории", "Perfeito и imperfeito вместе", "perfeito vs imperfeito portuguese", "de repente=вдруг;enquanto=пока;depois=потом;então=тогда / итак;aconteceu=случилось;no fim=в конце", "Смешной случай из жизни, 10 предложений", "Придумайте историю вместе: каждый добавляет по предложению"],
+    ["Планы и «если бы»", "vou fazer / faria / se eu pudesse", "conditional tense brazilian portuguese", "vou=я собираюсь;faria=я бы сделал;se eu pudesse=если бы я мог;planos=планы;daqui a um ano=через год;talvez=может быть", "Ваши планы на первый год в Бразилии", "Обсудите: где жить, работа, что сделать с малышом в первый год"],
+    ["Своё мнение", "acho que, na minha opinião, concordo/discordo", "giving opinions portuguese", "acho que=я думаю, что;concordo=согласен;discordo=не согласен;por um lado=с одной стороны;por outro lado=с другой стороны;depende=зависит", "Ваше мнение: лучше рожать в частной клинике или по SUS?", "Дебаты: город или пригород для жизни с ребёнком"],
+    ["Субжунтив (основы)", "espero que, é importante que, quero que + subjuntivo", "presente do subjuntivo brazilian portuguese", "espero que=надеюсь, что;é importante que=важно, чтобы;quero que=хочу, чтобы;talvez seja=возможно, это;embora=хотя;caso=в случае если", "6 пожеланий будущему ребёнку с «Espero que…»", "Советы друг другу: «É importante que você…»"],
+    ["Работа и деньги", "Как в Бразилии работают: CLT, MEI, фриланс", "working in brazil vocabulary", "emprego=работа;salário=зарплата;MEI=ИП;carteira de trabalho=трудовая книжка;freelancer=фрилансер;imposto=налог", "Короткое резюме о себе на португальском", "Собеседование на работу: HR и кандидат"],
+    ["Новости", "Как читать заголовки; segundo, de acordo com", "reading brazilian news portuguese", "segundo=согласно;governo=правительство;pesquisa=исследование;aumento=рост;crise=кризис;eleição=выборы", "Перескажите новость дня в 5 предложениях", "Каждый рассказывает свою новость, второй задаёт вопросы"],
+    ["Культура Бразилии", "Праздники, футбол, музыка; слово saudade", "brazilian culture festivals", "festa junina=июньский праздник;torcer=болеть (за команду);churrasco=барбекю;samba=самба;feriado=праздничный день;saudade=тоска по кому-то","Сравните русский и бразильский праздник", "Обсудите: какие бразильские традиции хотите перенять для семьи"],
+    ["Связки для текста", "além disso, no entanto, portanto — важно для экзамена", "conectivos português", "além disso=кроме того;no entanto=однако;portanto=поэтому;por exemplo=например;ou seja=то есть;em resumo=в итоге", "Абзац «плюсы и минусы жизни в Бразилии» со всеми связками", "Спорьте на любую тему, каждая реплика — со связкой"],
+    ["Рассказ о себе", "3 минуты без остановки — подготовка к интервью", "talking about yourself portuguese", "me mudei=я переехал;pretendo=я намерен;desafio=трудность;adaptação=адаптация;comunidade=сообщество;conquista=достижение", "Текст «Minha história» на 150 слов", "Каждый говорит 3 минуты о себе, второй засекает время и задаёт вопросы"],
+
+    ["Знакомство с экзаменом", "Формат CELPE-Bras: 4 задания и интервью. Откройте Acervo Celpe-Bras", "celpe-bras como funciona", "tarefa=задание;enunciado=формулировка задания;interlocutor=адресат;propósito=цель;gênero=жанр текста;leitor=читатель", "Разберите одно задание: кто пишет, кому, зачем, в каком жанре", "Объясните друг другу формат экзамена по-португальски"],
+    ["Задание 1: видео", "Конспект видео и пересказ для другого адресата", "celpe-bras tarefa 1 vídeo", "segundo o vídeo=согласно видео;o entrevistado=интервьюируемый;destacar=подчеркнуть;abordar=затрагивать тему;apresentar=представить;mencionar=упомянуть", "Пересказ видео из Acervo в виде e-mail другу", "Один смотрит видео и пересказывает, второй проверяет по видео"],
+    ["Задание 2: аудио", "Как ловить цифры, факты и мнения на слух", "celpe-bras tarefa 2 áudio", "dados=данные;cerca de=около;metade=половина;por cento=процентов;aumentou=выросло;diminuiu=уменьшилось", "Текст для сайта по аудио из Acervo", "Диктант цифр и фактов друг другу"],
+    ["Жанр: письмо и e-mail", "Письмо-просьба, письмо-жалоба: начало, тело, концовка", "carta formal celpe-bras", "venho por meio desta=настоящим обращаюсь;reclamação=жалоба;solicito=прошу;aguardo retorno=жду ответа;cordialmente=с уважением;prezados senhores=уважаемые господа", "Жалоба в управляющую компанию дома, 150 слов", "Проверьте письма друг друга: адресат, цель, жанр"],
+    ["Жанр: статья-мнение", "Artigo de opinião: заголовок, тезис, аргументы, вывод", "artigo de opinião estrutura", "título=заголовок;argumento=аргумент;defender=отстаивать;conclusão=вывод;convidar=приглашать;público=аудитория", "Статья «Vale a pena morar no Brasil?» на 180 слов", "Прочитайте статьи вслух и найдите по 2 улучшения"],
+    ["Задания 3–4: тексты", "Прочитать и переработать текст для нового читателя", "celpe-bras tarefa 3 4 leitura", "resumir=кратко изложить;reescrever=переписать;com suas palavras=своими словами;informar=информировать;convencer=убедить;orientar=давать рекомендации", "Задание 3 или 4 из Acervo, частично (20 минут)", "Сравните ваши ответы на одно и то же задание"],
+    ["Интервью, часть 1", "5 минут о себе: работа, увлечения, причины изучать португальский", "celpe-bras parte oral", "questionário=анкета;interesses=интересы;me formei em=я окончил (вуз) по;nas horas vagas=в свободное время;me interesso por=меня интересует;sonho=мечта", "Заполните анкету экзамена о себе", "Экзаменатор и кандидат: 5 минут вопросов, потом поменяйтесь"],
+    ["Интервью, часть 2", "Elementos provocadores: описать картинку, мнение, сравнить с Россией", "celpe-bras elementos provocadores", "a imagem mostra=на изображении;me chama atenção=мне бросается в глаза;no meu país=в моей стране;comparando=сравнивая;na minha experiência=по моему опыту;em geral=в целом", "План ответа по одной картинке из Acervo", "Обсуждение элемента из Acervo, 7 минут каждому"],
+    ["Пробная письменная часть", "Одно полное задание по таймеру, по кусочкам за неделю", "celpe-bras simulado", "rascunho=черновик;revisar=проверить;tempo=время;adequação=соответствие заданию;coesão=связность;registro=стиль речи", "Чистовик задания с проверкой по критериям", "Оцените тексты друг друга по критериям экзамена"],
+    ["Пробное интервью и запись", "Полное интервью 20 минут + регистрация на экзамен", "celpe-bras inscrição", "inscrição=регистрация на экзамен;posto aplicador=экзаменационный центр;certificado=сертификат;nível=уровень;intermediário=средний уровень;aprovado=сдал", "Напишите себе план: дата экзамена, центр, что подтянуть", "Полное пробное интервью: 5 минут о себе + элемент, по очереди"]
+  ];
+
+  const DAYS = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
+  const TOTAL = W.length * 6;
+
+  function phaseOf(w) { return PHASES.find(p => w >= p.weeks[0] && w <= p.weeks[1]); }
+  function words(i) { return W[i][3].split(";").map(s => { const [pt, ru] = s.split("="); return { pt, ru }; }); }
+  function ytLink(q) { return "https://www.youtube.com/results?search_query=" + encodeURIComponent(q); }
+
+  // Each day is a 20-minute session: [minutes, text] steps.
+  function daySteps(wi, d) {
+    const w = W[wi], p = phaseOf(wi + 1);
+    switch (d) {
+      case 0: return { title: "Новая тема", steps: [
+        [10, "Посмотрите урок: " + w[1] + "."],
+        [5, "Добавьте 6 слов недели в Anki."],
+        [5, "Проговорите слова вслух — нажимайте на динамик и повторяйте."]], link: true };
+      case 1: return { title: "Практика правила", steps: [
+        [5, "Карточки Anki."],
+        [10, "Напишите 5 своих предложений по правилу недели."],
+        [5, "Прочитайте их вслух, медленно и чётко."]] };
+      case 2: return { title: "Слушаем", steps: [
+        [5, "Карточки Anki."],
+        [10, "Слушаем: " + p.listen + "."],
+        [5, "Повторяйте за диктором фразу за фразой (shadowing)."]] };
+      case 3: return { title: "Читаем", steps: [
+        [5, "Карточки Anki."],
+        [10, "Читаем: " + p.read + "."],
+        [5, "Выпишите 3 новых слова и добавьте в Anki."]] };
+      case 4: return { title: "Пишем и говорим", steps: [
+        [5, "Карточки Anki."],
+        [10, w[4] + "."],
+        [5, "Прочитайте текст на диктофон и послушайте себя."]] };
+      default: return { title: "Вместе", steps: [
+        [20, w[5] + ". Только по-португальски, подглядывать в слова недели можно."]], together: true };
+    }
+  }
+
+  // ---------- state ----------
+  const state = { who: "anton", done: { anton: {}, yanina: {} }, db: null, tts: null };
+  try { const s = localStorage.getItem("pt-who"); if (s === "anton" || s === "yanina") state.who = s; } catch (e) {}
+  try { const s = JSON.parse(localStorage.getItem("pt-done") || "null"); if (s && s.anton && s.yanina) state.done = s; } catch (e) {}
+
+  const $ = id => document.getElementById(id);
+  const key = (wi, d) => "w" + (wi + 1) + "d" + (d + 1);
+  const todayISO = () => { const t = new Date(); return t.getFullYear() + "-" + String(t.getMonth() + 1).padStart(2, "0") + "-" + String(t.getDate()).padStart(2, "0"); };
+  const count = who => Object.keys(state.done[who]).length;
+
+  function streak(who) {
+    const dates = new Set(Object.values(state.done[who]));
+    let n = 0; const d = new Date();
+    if (!dates.has(todayISO())) d.setDate(d.getDate() - 1);
+    for (;;) {
+      const s = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+      if (dates.has(s)) { n++; d.setDate(d.getDate() - 1); }
+      else if (d.getDay() === 0) { d.setDate(d.getDate() - 1); } // Sunday is a rest day, it doesn't break the streak
+      else break;
+      if (n > 400) break;
+    }
+    return n;
+  }
+
+  function nextDay(who) {
+    for (let wi = 0; wi < W.length; wi++) for (let d = 0; d < 6; d++) if (!state.done[who][key(wi, d)]) return [wi, d];
+    return null;
+  }
+
+  // ---------- persistence ----------
+  // Shared database: Supabase REST API (table "progress", one row per person). Without config the site works locally only.
+  const CFG = window.PT_CONFIG || {};
+  const REMOTE = Boolean(CFG.supabaseUrl && CFG.supabaseKey);
+  const pending = { anton: false, yanina: false }, queued = { anton: false, yanina: false }, dirty = { anton: false, yanina: false };
+
+  function api(path, opts) {
+    return fetch(CFG.supabaseUrl.replace(/\/$/, "") + "/rest/v1/" + path, Object.assign({}, opts, {
+      headers: Object.assign({ apikey: CFG.supabaseKey, Authorization: "Bearer " + CFG.supabaseKey, "Content-Type": "application/json" }, (opts && opts.headers) || {})
+    })).then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r; });
+  }
+
+  function saveLocal() {
+    try { localStorage.setItem("pt-done", JSON.stringify(state.done)); } catch (e) {}
+  }
+
+  async function save(who) {
+    saveLocal();
+    if (!REMOTE) return;
+    dirty[who] = true;
+    if (pending[who]) { queued[who] = true; return; }
+    pending[who] = true;
+    try {
+      await api("progress", { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+        body: JSON.stringify({ who, done: state.done[who], updated_at: new Date().toISOString() }) });
+      dirty[who] = false;
+      setSync("Сохранено в общей базе — видно с любого телефона.");
+    } catch (e) {
+      setSync("Нет связи с базой. Отметка сохранена на телефоне и отправится, когда появится интернет.");
+    }
+    pending[who] = false;
+    if (queued[who]) { queued[who] = false; save(who); }
+  }
+
+  async function load() {
+    if (!REMOTE) { setSync("База не подключена — прогресс хранится только на этом телефоне."); return; }
+    // Push changes that didn't reach the server yet before reading, so they are not overwritten.
+    for (const who of ["anton", "yanina"]) if (dirty[who] && !pending[who]) await save(who);
+    if (pending.anton || pending.yanina) return;
+    try {
+      const rows = await (await api("progress?select=who,done")).json();
+      rows.forEach(r => {
+        if ((r.who === "anton" || r.who === "yanina") && r.done && typeof r.done === "object" && !dirty[r.who]) {
+          const clean = {};
+          Object.keys(r.done).forEach(k => { if (/^w\d+d\d$/.test(k) && typeof r.done[k] === "string") clean[k] = r.done[k]; });
+          state.done[r.who] = clean;
+        }
+      });
+      saveLocal(); render();
+      setSync("Прогресс в общей базе — открывайте с любого телефона.");
+    } catch (e) {
+      setSync("Нет связи с базой — показываю прогресс, сохранённый на этом телефоне.");
+    }
+  }
+  function setSync(t) { $("sync").textContent = t; }
+
+  // Backup code: progress of one person packed into a short text the person can copy and paste on another phone.
+  function makeCode(who) {
+    return "PT1:" + who + ":" + Object.keys(state.done[who]).sort().map(k => k.slice(1) + "@" + state.done[who][k].replace(/-/g, "")).join(",");
+  }
+  function readCode(text) {
+    const m = String(text).trim().match(/^PT1:(anton|yanina):(.*)$/);
+    if (!m) return null;
+    const out = {};
+    for (const part of m[2].split(",").filter(Boolean)) {
+      const p = part.match(/^(\d+d\d)@(\d{4})(\d{2})(\d{2})$/);
+      if (!p) return null;
+      out["w" + p[1]] = p[2] + "-" + p[3] + "-" + p[4];
+    }
+    return { who: m[1], done: out };
+  }
+
+  function toggle(wi, d, on) {
+    const k = key(wi, d), who = state.who;
+    if (on) state.done[who][k] = todayISO(); else delete state.done[who][k];
+    render(); save(who);
+  }
+
+  // ---------- speech ----------
+  const SPK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+  function speak(text) {
+    const t = text.replace(/\s*\/\s*/g, ", ").replace(/[?!]/g, "");
+    if (state.tts) { state.tts.speak(t, { language: "pt-BR", rate: 0.85 }).catch(() => fallbackSpeak(t)); return; }
+    fallbackSpeak(t);
+  }
+  function fallbackSpeak(t) {
+    try { const u = new SpeechSynthesisUtterance(t); u.lang = "pt-BR"; u.rate = 0.85; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {}
+  }
+
+  // ---------- render ----------
+  function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+
+  function renderWho() {
+    ["anton", "yanina"].forEach(who => {
+      const b = $("btn-" + who), n = count(who);
+      b.setAttribute("aria-pressed", String(who === state.who));
+      b.querySelector("i").style.width = (n / TOTAL * 100).toFixed(1) + "%";
+      const nd = nextDay(who);
+      b.querySelector("small").textContent = n + " из " + TOTAL + " · " + (nd ? "неделя " + (nd[0] + 1) : "план пройден");
+    });
+  }
+
+  function renderToday() {
+    const el = $("today"), who = state.who, name = who === "anton" ? "Антон" : "Янина";
+    const nd = nextDay(who), st = streak(who);
+    const doneToday = Object.values(state.done[who]).filter(v => v === todayISO()).length;
+    if (!nd) { el.innerHTML = '<h2>Весь план пройден!</h2><p>Parabéns, ' + name + '! Время регистрироваться на CELPE-Bras.</p>'; return; }
+    const [wi, d] = nd, w = W[wi], p = phaseOf(wi + 1), ds = daySteps(wi, d);
+    let html = '<div class="today-head"><div><span class="eyebrow">' + esc(name) + ' · неделя ' + (wi + 1) + ' · ' + DAYS[d] + ' · фаза «' + esc(p.name) + '»</span>' +
+      '<h2>' + esc(w[0]) + ': ' + esc(ds.title.toLowerCase()) + '</h2></div>' +
+      '<span class="streak">' + (st ? "Серия: " + st + " дн." : "Начните серию сегодня") + '</span></div>';
+    if (doneToday) html += '<p class="tip">Сегодня уже сделано занятий: ' + doneToday + '. Можно взять следующее или отдохнуть — на сегодня норма выполнена.</p>';
+    html += '<ol class="steps">' + ds.steps.map(s => '<li><span class="min">' + s[0] + '<span>мин</span></span><span>' + esc(s[1]) + '</span></li>').join("") + '</ol>';
+    if (ds.link) html += '<p><a href="' + ytLink(w[2]) + '" target="_blank" rel="noopener">Найти урок на YouTube: «' + esc(w[2]) + '»</a></p>';
+    html += '<div><span class="eyebrow">Слова недели</span></div><div class="words">' + words(wi).map((x, i) =>
+      '<div class="word"><button type="button" class="say" data-say="' + esc(x.pt) + '" aria-label="Послушать ' + esc(x.pt) + '">' + SPK + '</button><div><b>' + esc(x.pt) + '</b><small>' + esc(x.ru) + '</small></div></div>').join("") + '</div>';
+    if (ds.together) html += '<p class="tip">Суббота — занятие вдвоём. Отметьте его каждый в своём профиле.</p>';
+    html += '<button type="button" id="done-today" class="done-btn">Готово — занятие сделано</button>';
+    el.innerHTML = html;
+    $("done-today").onclick = () => toggle(wi, d, true);
+  }
+
+  let openWeeks = null;
+  function renderPlan() {
+    const el = $("pane-plan"), who = state.who, nd = nextDay(who), cur = nd ? nd[0] : -1;
+    if (openWeeks === null) openWeeks = new Set(cur >= 0 ? [cur] : []);
+    else el.querySelectorAll("details.week").forEach(dt => { const i = +dt.dataset.w; dt.open ? openWeeks.add(i) : openWeeks.delete(i); });
+    let html = '';
+    PHASES.forEach((p, pi) => {
+      html += '<div class="phase"><div class="phase-head"><h2>' + (pi + 1) + '. ' + esc(p.name) + '</h2><span class="lvl">' + p.lvl + ' · недели ' + p.weeks[0] + '–' + p.weeks[1] + '</span></div>';
+      for (let wi = p.weeks[0] - 1; wi < p.weeks[1]; wi++) {
+        const w = W[wi];
+        const dots = DAYS.map((_, d) => '<i class="' + (state.done[who][key(wi, d)] ? "on" : "") + '"></i>').join("");
+        html += '<details class="week' + (wi === cur ? " current" : "") + '" data-w="' + wi + '"' + (openWeeks.has(wi) ? " open" : "") + '><summary><span class="wnum">' + String(wi + 1).padStart(2, "0") + '</span><span class="wtitle"><b>' + esc(w[0]) + '</b><br><small class="muted">' + esc(w[1]) + '</small></span><span class="dots" aria-label="Сделано дней">' + dots + '</span></summary><div class="wbody">';
+        html += '<p class="muted"><b>Слова:</b> ' + words(wi).map(x => esc(x.pt) + " — " + esc(x.ru)).join(" · ") + '</p>';
+        for (let d = 0; d < 6; d++) {
+          const ds = daySteps(wi, d), id = "c-" + key(wi, d), on = !!state.done[who][key(wi, d)];
+          html += '<div class="day"><input type="checkbox" id="' + id + '" data-w="' + wi + '" data-d="' + d + '"' + (on ? " checked" : "") + '><label for="' + id + '"><b>' + DAYS[d] + ' · ' + esc(ds.title) + '.</b> ' + esc(ds.steps.map(s => s[1]).join(" ")) + '</label></div>';
+        }
+        html += '</div></details>';
+      }
+      html += '</div>';
+    });
+    el.innerHTML = html;
+    el.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.onchange = () => toggle(+cb.dataset.w, +cb.dataset.d, cb.checked));
+  }
+
+  function render() { renderWho(); renderToday(); renderPlan(); }
+
+  // ---------- events ----------
+  document.querySelectorAll("#who button").forEach(b => b.onclick = () => {
+    state.who = b.dataset.who; openWeeks = null;
+    try { localStorage.setItem("pt-who", state.who); } catch (e) {}
+    render();
+  });
+  document.addEventListener("click", e => { const b = e.target.closest("[data-say]"); if (b) speak(b.dataset.say); });
+  document.querySelectorAll('[role="tab"]').forEach(t => t.onclick = () => {
+    document.querySelectorAll('[role="tab"]').forEach(x => x.setAttribute("aria-selected", String(x === t)));
+    ["plan", "exam", "how"].forEach(n => $("pane-" + n).hidden = n !== t.dataset.tab);
+  });
+
+  render();
+  load();
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") load(); });
+  setInterval(() => { if (document.visibilityState === "visible") load(); }, 60000);
+
+  // ---------- backup ----------
+  const bMsg = t => { $("backup-msg").textContent = t; };
+  $("backup-copy").onclick = () => {
+    const code = makeCode(state.who), box = $("backup-text");
+    box.value = code;
+    const done = () => bMsg("Код скопирован. Сохраните его в заметки или отправьте себе в мессенджер.");
+    try { navigator.clipboard.writeText(code).then(done, () => { box.select(); bMsg("Код в поле ниже — выделите и скопируйте его."); }); }
+    catch (e) { box.select(); bMsg("Код в поле ниже — выделите и скопируйте его."); }
+  };
+  $("backup-load").onclick = () => {
+    const r = readCode($("backup-text").value);
+    if (!r) { bMsg("Код не распознан. Вставьте его целиком, он начинается с PT1:"); return; }
+    state.done[r.who] = r.done; state.who = r.who; openWeeks = null;
+    try { localStorage.setItem("pt-who", r.who); } catch (e) {}
+    save(r.who); render();
+    bMsg("Прогресс восстановлен: " + (r.who === "anton" ? "Антон" : "Янина") + ", " + Object.keys(r.done).length + " занятий.");
+  };
+
+  // ---------- pronunciation voice (works without it too) ----------
+  try { if (window.claude && window.claude.use) window.claude.use("tts").then(t => { state.tts = t; }).catch(() => {}); } catch (e) {}
+})();
+</script>
+</body>
+</html>
