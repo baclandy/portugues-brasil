@@ -6,31 +6,40 @@
 <title>Português para o Brasil</title>
 <script src="config.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap">
 <style>
-/* Layout: one narrow column like a study notebook; profile switch on top, today's 20 minutes first, full 48-week plan below */
+/* Layout: one narrow column under a soft sky; big bird tiles on the start screen, today's 20 minutes first, plan below.
+   Mood: pastel Brazilian birds (tucano, beija-flor, sabiá…), rounded type, soft cards. */
 :root {
-  --bg: #F3F6F1;
+  --bg: #EEF6FD;
+  --sky: #DCEEFC;
   --surface: #FFFFFF;
-  --fg: #16241E;
-  --muted: #5B6B63;
-  --line: #DCE4DD;
-  --green: #1E6B4E;
-  --green-soft: #E2EFE8;
-  --sun: #E3A72F;
-  --sun-soft: #FBF0D6;
-  --blue: #23508F;
-  --ok: #1E6B4E;
-  --display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
-  --body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --fg: #2B3550;
+  --muted: #6B7590;
+  --line: #DCE6F2;
+  --green: #2A9673;
+  --green-soft: #E1F4EB;
+  --sun: #F2B33A;
+  --sun-soft: #FFF1D2;
+  --pink: #E8739E;
+  --pink-soft: #FDE8EF;
+  --blue: #3A6FC4;
+  --ok: #2A9673;
+  --bad: #D9534F;
+  --cloud: rgba(255, 255, 255, .85);
+  --shadow: 0 6px 18px rgba(58, 90, 140, .10);
+  --display: "Fredoka", "Arial Rounded MT Bold", system-ui, sans-serif;
+  --body: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #0E1714; --surface: #16221D; --fg: #E5EDE8; --muted: #93A69C; --line: #26362F;
-  --green: #5EC197; --green-soft: #1A3329; --sun: #E9B54A; --sun-soft: #33291A; --blue: #8DB4EC; --ok: #5EC197;
+  --bg: #131A2C; --sky: #1B2540; --surface: #1E2843; --fg: #EAF0FA; --muted: #9DA9C5; --line: #2D3958;
+  --green: #6FD3AE; --green-soft: #1E3A37; --sun: #F7C35C; --sun-soft: #3A321F; --pink: #F5A3C1; --pink-soft: #3B2536;
+  --blue: #9DBBF0; --ok: #6FD3AE; --bad: #F08A84; --cloud: rgba(255, 255, 255, .05); --shadow: 0 6px 18px rgba(0, 0, 0, .25);
   color-scheme: dark } }
 :root[data-theme="dark"] {
-  --bg: #0E1714; --surface: #16221D; --fg: #E5EDE8; --muted: #93A69C; --line: #26362F;
-  --green: #5EC197; --green-soft: #1A3329; --sun: #E9B54A; --sun-soft: #33291A; --blue: #8DB4EC; --ok: #5EC197;
+  --bg: #131A2C; --sky: #1B2540; --surface: #1E2843; --fg: #EAF0FA; --muted: #9DA9C5; --line: #2D3958;
+  --green: #6FD3AE; --green-soft: #1E3A37; --sun: #F7C35C; --sun-soft: #3A321F; --pink: #F5A3C1; --pink-soft: #3B2536;
+  --blue: #9DBBF0; --ok: #6FD3AE; --bad: #F08A84; --cloud: rgba(255, 255, 255, .05); --shadow: 0 6px 18px rgba(0, 0, 0, .25);
   color-scheme: dark }
 
 * { box-sizing: border-box; }
@@ -148,30 +157,97 @@ details.week.current { border-color: var(--green); }
 .roles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 @media (max-width: 520px) { .roles { grid-template-columns: 1fr; } }
 .role { border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+
+/* ---------- birds theme ---------- */
+body {
+  font-size: 16px;
+  background:
+    radial-gradient(120px 46px at 12% 90px, var(--cloud), transparent 70%),
+    radial-gradient(160px 56px at 88% 160px, var(--cloud), transparent 70%),
+    radial-gradient(130px 44px at 70% 40px, var(--cloud), transparent 70%),
+    linear-gradient(180deg, var(--sky) 0, var(--bg) 420px) no-repeat,
+    var(--bg);
+}
+h1, h2, h3 { font-weight: 700; letter-spacing: 0; }
+h1 { font-weight: 700; }
+h2 { font-weight: 600; }
+.eyebrow { font-weight: 800; }
+.bird { display: inline-block; flex: none; line-height: 0; }
+.bird svg { width: 100%; height: 100%; overflow: visible; }
+.flock { color: var(--muted); opacity: .55; width: 92px; height: 28px; }
+
+.tile { border-radius: 26px; box-shadow: var(--shadow); border-width: 2px; position: relative; padding: 18px 20px; flex-direction: row; align-items: center; gap: 24px; }
+.tile .info { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 0; }
+.tile .name { font-weight: 600; }
+.tile .bird { width: 76px; height: 76px; transition: transform .25s; }
+.tile:hover .bird, .tile:focus-visible .bird { transform: translateY(-4px) rotate(-6deg); }
+.tile.t-anton { background: var(--green-soft); border-color: transparent; }
+.tile.t-yanina { background: var(--pink-soft); border-color: transparent; }
+.tile.together { border-color: transparent; }
+.tile .name::after { content: none; }
+.tile .bird-name { font-size: 13px; color: var(--muted); }
+
+.bar { height: 10px; border-radius: 10px; background: var(--surface); overflow: visible; position: relative; margin: 6px 0 4px; }
+.bar i { background: linear-gradient(90deg, var(--green), var(--sun)); border-radius: 10px; }
+.t-yanina .bar i { background: linear-gradient(90deg, var(--pink), var(--sun)); }
+.bar .mini { position: absolute; top: -15px; width: 26px; height: 26px; margin-left: -4px; left: 0; transition: left .4s; }
+
+.dayfact { background: var(--surface); border-radius: 22px; padding: 14px 16px; box-shadow: var(--shadow); display: flex; gap: 14px; align-items: center; }
+.dayfact .bird { width: 54px; height: 54px; }
+.dayfact b { font-family: var(--display); font-weight: 600; font-size: 18px; }
+
+.today, .stage, .card, .game-card { border-radius: 26px; border-color: transparent; box-shadow: var(--shadow); }
+details.week { border-radius: 18px; border-color: transparent; box-shadow: 0 2px 8px rgba(58, 90, 140, .07); }
+details.week.current { border-color: var(--pink); }
+.dots i.on { background: var(--pink); }
+.word { border-radius: 16px; background: var(--bg); border-color: transparent; }
+.say { background: var(--pink-soft); color: var(--pink); border-color: transparent; }
+.done-btn, .play { border-radius: 999px; background: var(--pink); color: #fff; box-shadow: 0 4px 0 rgba(0,0,0,.08); }
+.done-btn.is-done { background: var(--pink-soft); color: var(--pink); }
+.ghost, .back { border-radius: 999px; }
+.streak { border-radius: 999px; }
+.tip { border-radius: 18px; }
+.opt { border-radius: 18px; }
+.opt.wrong { border-color: var(--bad); }
+.timer.low { color: var(--bad); }
+.lvl { border-color: var(--pink); color: var(--pink); }
+.phase-head { align-items: center; }
+.phase-title { display: flex; align-items: center; gap: 10px; }
+.phase-title .bird { width: 44px; height: 44px; }
+.topbar .bird { width: 40px; height: 40px; }
+
+.toast { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 140%); background: var(--surface); color: var(--fg); border-radius: 999px; padding: 8px 18px 8px 8px; box-shadow: var(--shadow); display: flex; gap: 10px; align-items: center; font-weight: 700; transition: transform .35s cubic-bezier(.2, 1.4, .4, 1); z-index: 20; max-width: calc(100% - 32px); }
+.toast.show { transform: translate(-50%, 0); }
+.toast .bird { width: 44px; height: 44px; }
+@keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+.bob { animation: bob 2.4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .bob { animation: none; } .toast, .tile .bird, .bar .mini { transition: none; } }
 </style>
 </head>
 <body>
 <div class="wrap">
  <div id="view-start" class="start">
   <header>
+    <span class="bird flock" data-bird="flock"></span>
     <span class="eyebrow">20 минут в день · 48 недель · до CELPE-Bras</span>
     <h1>Português para o Brasil</h1>
     <p class="muted">Бразильский португальский для жизни в Бразилии, роддома, документов и экзамена на гражданство.</p>
   </header>
   <div class="tiles">
-    <button type="button" class="tile" id="btn-anton" data-go="anton"><span class="name">Антон</span><span class="bar"><i></i></span><small>0 из 288 занятий</small></button>
-    <button type="button" class="tile" id="btn-yanina" data-go="yanina"><span class="name">Янина</span><span class="bar"><i></i></span><small>0 из 288 занятий</small></button>
-    <button type="button" class="tile together" id="btn-vmeste" data-go="vmeste"><span class="name">Вместе</span><small id="vmeste-info">Игры на словах, которые вы уже прошли</small></button>
+    <button type="button" class="tile t-anton" id="btn-anton" data-go="anton"><span class="bird bob" data-bird="tucano"></span><span class="info"><span class="name">Антон</span><span class="bar"><i></i><span class="bird mini" data-bird="tucano"></span></span><small>0 из 288 занятий</small><span class="bird-name">tucano — тукан</span></span></button>
+    <button type="button" class="tile t-yanina" id="btn-yanina" data-go="yanina"><span class="bird bob" data-bird="beijaflor"></span><span class="info"><span class="name">Янина</span><span class="bar"><i></i><span class="bird mini" data-bird="beijaflor"></span></span><small>0 из 288 занятий</small><span class="bird-name">beija-flor — колибри</span></span></button>
+    <button type="button" class="tile together" id="btn-vmeste" data-go="vmeste"><span class="bird bob" data-bird="casal"></span><span class="info"><span class="name">Вместе</span><small id="vmeste-info">Игры на словах, которые вы уже прошли</small><span class="bird-name">periquitos — попугайчики-неразлучники</span></span></button>
   </div>
+  <div class="dayfact" id="dayfact"></div>
  </div>
 
  <div id="view-together" hidden>
-  <div class="topbar"><button type="button" class="back" data-go="">← Назад</button><h1>Вместе</h1></div>
+  <div class="topbar"><button type="button" class="back" data-go="">← Назад</button><span class="bird" data-bird="casal"></span><h1>Вместе</h1></div>
   <div id="together" style="display:flex;flex-direction:column;gap:16px;margin-top:16px"></div>
  </div>
 
  <div id="view-person" hidden style="display:flex;flex-direction:column;gap:22px">
-  <div class="topbar"><button type="button" class="back" data-go="">← Назад</button><h1 id="person-name">Антон</h1></div>
+  <div class="topbar"><button type="button" class="back" data-go="">← Назад</button><span class="bird" id="person-bird" data-bird="tucano"></span><h1 id="person-name">Антон</h1></div>
 
   <section class="today" id="today" aria-live="polite"></section>
 
@@ -267,6 +343,7 @@ details.week.current { border-color: var(--green); }
 
  <p class="sync" id="sync">Загружаю прогресс…</p>
 </div>
+<div class="toast" id="toast" role="status" aria-live="polite"><span class="bird" data-bird="sabia"></span><span id="toast-text">Muito bem!</span></div>
 
 <script>
 (function () {
@@ -520,6 +597,76 @@ details.week.current { border-color: var(--green); }
     try { const u = new SpeechSynthesisUtterance(t); u.lang = "pt-BR"; u.rate = 0.85; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {}
   }
 
+  // ---------- birds ----------
+  // Chubby cartoon Brazilian birds drawn from simple shapes (viewBox 100x100, facing right).
+  const BIRD_SPECS = {
+    tucano: { body: "#2E2E38", head: "#2E2E38", belly: "#FFF3C4", wing: "#43434F", beak: "tucano", ring: "#8FD8F2" },
+    beijaflor: { body: "#4CC38A", head: "#3DB27D", belly: "#E6FFF2", wing: "#2E9D6C", beak: "long", throat: "#B57BEA" },
+    araraazul: { body: "#3A5ED0", head: "#3A5ED0", belly: "#5577E0", wing: "#2B49AE", beak: "hook", beakColor: "#2E2E38", ring: "#FFD23F" },
+    bemtevi: { body: "#A0805E", head: "#33302D", belly: "#FFD84D", wing: "#80654A", beak: "small", beakColor: "#33302D", brow: true },
+    sabia: { body: "#A39484", head: "#A39484", belly: "#F2994A", wing: "#8A7C6C", beak: "small", beakColor: "#E8B04A" },
+    periquito: { body: "#7AD07A", head: "#FFB27A", belly: "#BDEBA4", wing: "#57B05A", beak: "hook", beakColor: "#F2764B" },
+    periquita: { body: "#7AD07A", head: "#FF94B4", belly: "#BDEBA4", wing: "#57B05A", beak: "hook", beakColor: "#F2764B" }
+  };
+  function birdParts(s) {
+    let g = '<path d="M42 84 L40 93 M54 84 L55 93" stroke="#F2A93B" stroke-width="3.5" stroke-linecap="round" fill="none"/>' +
+      '<path d="M24 60 L3 71 L10 57 L3 45 Z" fill="' + s.wing + '"/>' +
+      '<ellipse cx="46" cy="60" rx="30" ry="26" fill="' + s.body + '"/>' +
+      '<ellipse cx="55" cy="68" rx="18" ry="14" fill="' + s.belly + '"/>' +
+      '<ellipse cx="39" cy="61" rx="16" ry="11" transform="rotate(-18 39 61)" fill="' + s.wing + '"/>' +
+      '<circle cx="62" cy="40" r="20" fill="' + s.head + '"/>';
+    if (s.throat) g += '<ellipse cx="70" cy="53" rx="8" ry="5" fill="' + s.throat + '"/>';
+    if (s.brow) g += '<path d="M48 35 Q62 27 80 34" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round" fill="none"/>';
+    if (s.ring) g += '<circle cx="68" cy="38" r="7" fill="' + s.ring + '"/>';
+    g += '<circle cx="68" cy="38" r="4.3" fill="#222"/><circle cx="69.6" cy="36.4" r="1.5" fill="#fff"/>' +
+      '<circle cx="63" cy="48" r="3.8" fill="#FF8FAB" opacity=".55"/>';
+    if (s.beak === "small") g += '<path d="M80 40 L92 44 L80 48 Z" fill="' + s.beakColor + '"/>';
+    if (s.beak === "long") g += '<path d="M80 42 L107 44 L80 46 Z" fill="#3A3A3A"/>';
+    if (s.beak === "hook") g += '<path d="M79 35 Q94 36 91 50 Q87 45 80 47 Z" fill="' + s.beakColor + '"/>';
+    if (s.beak === "tucano") g += '<path d="M78 32 Q100 29 107 44 Q99 53 78 49 Z" fill="#FF9F1C"/><path d="M101 37 Q107 42 107 44 Q104 47 99 47 Z" fill="#2E2E38"/><path d="M80 41 Q94 41 105 44" stroke="#E07B00" stroke-width="1.5" fill="none"/>';
+    return g;
+  }
+  function birdSVG(kind) {
+    if (kind === "casal") return '<svg viewBox="0 0 170 100" aria-hidden="true"><g transform="translate(2 8) scale(.88)">' + birdParts(BIRD_SPECS.periquito) +
+      '</g><g transform="translate(168 8) scale(-.88 .88)">' + birdParts(BIRD_SPECS.periquita) +
+      '</g><path d="M85 30 C85 24 77 22 77 29 C77 34 85 38 85 38 C85 38 93 34 93 29 C93 22 85 24 85 30 Z" fill="#FF6F9C"/></svg>';
+    if (kind === "flock") return '<svg viewBox="0 0 92 28" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 14 Q10 7 16 14 Q22 7 28 14"/><path d="M36 22 Q41 16 46 22 Q51 16 56 22"/><path d="M62 8 Q67 2 72 8 Q77 2 82 8"/></svg>';
+    return '<svg viewBox="0 0 100 100" aria-hidden="true">' + birdParts(BIRD_SPECS[kind] || BIRD_SPECS.sabia) + '</svg>';
+  }
+  function paintBirds() {
+    document.querySelectorAll("[data-bird]").forEach(el => {
+      if (el.dataset.painted !== el.dataset.bird) { el.innerHTML = birdSVG(el.dataset.bird); el.dataset.painted = el.dataset.bird; }
+    });
+  }
+  const PHASE_BIRDS = ["sabia", "bemtevi", "beijaflor", "tucano", "araraazul"];
+  const BIRD_FACTS = [
+    ["sabiá-laranjeira", "рыжебрюхий дрозд", "sabia", "Национальная птица Бразилии. Поёт на рассвете, о нём сложено много песен."],
+    ["bem-te-vi", "бентеви", "bemtevi", "Имя повторяет его крик и значит «хорошо тебя вижу». Живёт почти в каждом бразильском городе."],
+    ["beija-flor", "колибри", "beijaflor", "Буквально «целующий цветок». В Бразилии больше 80 видов колибри."],
+    ["tucano", "тукан", "tucano", "Клюв огромный, но лёгкий. Через него тукан сбрасывает лишнее тепло в жару."],
+    ["arara-azul", "гиацинтовый ара", "araraazul", "Самый крупный летающий попугай в мире. Живёт в Пантанале."],
+    ["periquito", "попугайчик", "periquito", "Так называют маленьких попугаев. Часто летают шумными парами."],
+    ["passarinho", "птичка", "sabia", "Ласковое слово для любой маленькой птицы: «Que passarinho fofo!» — какая милая птичка!"],
+    ["pássaro", "птица", "bemtevi", "Обычное слово для птицы. В новостях и науке чаще говорят «ave»."]
+  ];
+  function renderDayFact() {
+    const t = new Date(), day = Math.floor((t - new Date(t.getFullYear(), 0, 0)) / 864e5);
+    const f = BIRD_FACTS[day % BIRD_FACTS.length];
+    $("dayfact").innerHTML = '<span class="bird bob" data-bird="' + f[2] + '"></span><div><span class="eyebrow">Птичка дня</span><br>' +
+      '<b>' + esc(f[0]) + '</b> — ' + esc(f[1]) + ' <button type="button" class="say" style="display:inline-grid;vertical-align:middle" data-say="' + esc(f[0]) + '" aria-label="Послушать ' + esc(f[0]) + '">' + SPK + '</button>' +
+      '<p class="muted" style="font-size:14px">' + esc(f[3]) + '</p></div>';
+  }
+  let toastTimer = null;
+  function cheer() {
+    const msgs = ["Muito bem!", "Arrasou!", "Parabéns!", "Que orgulho!"], kinds = ["sabia", "beijaflor", "tucano", "bemtevi", "periquita"];
+    $("toast").querySelector(".bird").dataset.bird = kinds[Math.floor(Math.random() * kinds.length)];
+    $("toast-text").textContent = msgs[Math.floor(Math.random() * msgs.length)] + " +1 занятие";
+    paintBirds();
+    $("toast").classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => $("toast").classList.remove("show"), 2400);
+  }
+
   // ---------- render ----------
   function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
 
@@ -527,12 +674,14 @@ details.week.current { border-color: var(--green); }
     ["anton", "yanina"].forEach(who => {
       const b = $("btn-" + who), n = count(who);
       b.querySelector("i").style.width = (n / TOTAL * 100).toFixed(1) + "%";
+      b.querySelector(".mini").style.left = (n / TOTAL * 100).toFixed(1) + "%";
       const nd = nextDay(who);
       b.querySelector("small").textContent = n + " из " + TOTAL + " занятий · " + (nd ? "неделя " + (nd[0] + 1) : "план пройден");
     });
     const p = pool("all");
     $("vmeste-info").textContent = "Игры на словах, которые вы прошли · " + p.words.length + " слов" + (p.empty ? " (пока 1-я неделя)" : "");
     $("person-name").textContent = state.who === "anton" ? "Антон" : "Янина";
+    $("person-bird").dataset.bird = state.who === "anton" ? "tucano" : "beijaflor";
   }
 
   function renderToday() {
@@ -552,7 +701,7 @@ details.week.current { border-color: var(--green); }
     if (ds.together) html += '<p class="tip">Суббота — занятие вдвоём. Отметьте его каждый в своём профиле.</p>';
     html += '<button type="button" id="done-today" class="done-btn">Готово — занятие сделано</button>';
     el.innerHTML = html;
-    $("done-today").onclick = () => toggle(wi, d, true);
+    $("done-today").onclick = () => { toggle(wi, d, true); cheer(); };
   }
 
   let openWeeks = null;
@@ -562,7 +711,7 @@ details.week.current { border-color: var(--green); }
     else el.querySelectorAll("details.week").forEach(dt => { const i = +dt.dataset.w; dt.open ? openWeeks.add(i) : openWeeks.delete(i); });
     let html = '';
     PHASES.forEach((p, pi) => {
-      html += '<div class="phase"><div class="phase-head"><h2>' + (pi + 1) + '. ' + esc(p.name) + '</h2><span class="lvl">' + p.lvl + ' · недели ' + p.weeks[0] + '–' + p.weeks[1] + '</span></div>';
+      html += '<div class="phase"><div class="phase-head"><span class="phase-title"><span class="bird" data-bird="' + PHASE_BIRDS[pi] + '"></span><h2>' + (pi + 1) + '. ' + esc(p.name) + '</h2></span><span class="lvl">' + p.lvl + ' · недели ' + p.weeks[0] + '–' + p.weeks[1] + '</span></div>';
       for (let wi = p.weeks[0] - 1; wi < p.weeks[1]; wi++) {
         const w = W[wi];
         const dots = DAYS.map((_, d) => '<i class="' + (state.done[who][key(wi, d)] ? "on" : "") + '"></i>').join("");
@@ -764,7 +913,8 @@ details.week.current { border-color: var(--green); }
   }
   window.addEventListener("hashchange", route);
 
-  function render() { renderWho(); renderToday(); renderPlan(); if (!$("view-together").hidden && !G.game) renderTogether(); }
+  function render() { renderWho(); renderToday(); renderPlan(); if (!$("view-together").hidden && !G.game) renderTogether(); paintBirds(); }
+  renderDayFact();
 
   // ---------- events ----------
   document.addEventListener("click", e => {
