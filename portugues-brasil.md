@@ -4,6 +4,8 @@
 
 ## Stack and structure
 - `index.html` — the whole site (plan data, UI, logic), plain HTML/CSS/JS, no build.
+  Views by URL hash: start screen (Антон / Янина / Вместе), `#anton` / `#yanina` personal plan, `#vmeste` games
+  (Дуэль, Объясни слово, Сценка) on words from weeks either person has started.
 - `config.js` — Supabase URL and anon public key (public by design).
 - `supabase.sql` — table `progress` (one row per person: `who`, `done` jsonb) with RLS for the anon key.
 - Hosting: GitHub Pages from `main`, repo `baclandy/portugues-brasil`.

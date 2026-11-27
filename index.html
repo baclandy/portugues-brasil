@@ -111,21 +111,67 @@ details.week.current { border-color: var(--green); }
 .tabs button { border: 1px solid var(--line); background: transparent; color: var(--fg); border-radius: 999px; padding: 6px 14px; }
 .tabs button[aria-selected="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
 @media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+
+/* start screen */
+.start { display: flex; flex-direction: column; gap: 22px; padding-top: 4vh; }
+.tiles { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.tile { border: 2px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 18px; padding: 20px; text-align: left; display: flex; flex-direction: column; gap: 8px; }
+.tile:hover { border-color: var(--green); }
+.tile .name { font-family: var(--display); font-weight: 800; font-size: 28px; display: flex; justify-content: space-between; align-items: center; }
+.tile .name::after { content: "→"; color: var(--green); font-size: 24px; }
+.tile small { color: var(--muted); font-variant-numeric: tabular-nums; }
+.tile.together { background: var(--sun-soft); border-color: var(--sun); }
+.topbar { display: flex; align-items: center; gap: 12px; }
+.back { border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 999px; padding: 6px 14px; }
+.topbar h1 { font-size: 28px; }
+
+/* games */
+.games { display: grid; gap: 12px; }
+.game-card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 8px; }
+.play { align-self: flex-start; border: 0; border-radius: 12px; padding: 10px 18px; background: var(--green); color: var(--bg); font-weight: 600; }
+.ghost { align-self: flex-start; border: 1px solid var(--line); border-radius: 12px; padding: 10px 18px; background: transparent; color: var(--fg); }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.stage { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.turn { font-family: var(--display); font-weight: 800; font-size: 22px; }
+.score { font-variant-numeric: tabular-nums; color: var(--muted); }
+.big-word { font-family: var(--display); font-weight: 800; font-size: clamp(30px, 9vw, 44px); line-height: 1.1; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; overflow-wrap: anywhere; }
+.opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 460px) { .opts { grid-template-columns: 1fr; } }
+.opt { border: 2px solid var(--line); background: var(--bg); color: var(--fg); border-radius: 12px; padding: 14px; text-align: left; font-size: 16px; }
+.opt.right { border-color: var(--ok); background: var(--green-soft); }
+.opt.wrong { border-color: #C2453A; }
+.timer { font-family: var(--display); font-weight: 800; font-size: 40px; font-variant-numeric: tabular-nums; color: var(--green); }
+.timer.low { color: #C2453A; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; background: var(--bg); color: var(--fg); font-size: 15px; }
+.chip.used { background: var(--green-soft); border-color: var(--green); text-decoration: line-through; }
+.roles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 520px) { .roles { grid-template-columns: 1fr; } }
+.role { border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
 </style>
 </head>
 <body>
 <div class="wrap">
+ <div id="view-start" class="start">
   <header>
     <span class="eyebrow">20 минут в день · 48 недель · до CELPE-Bras</span>
     <h1>Português para o Brasil</h1>
     <p class="muted">Бразильский португальский для жизни в Бразилии, роддома, документов и экзамена на гражданство.</p>
   </header>
-
-  <div class="who" id="who">
-    <button type="button" id="btn-anton" data-who="anton" aria-pressed="false"><span class="name">Антон</span><span class="bar"><i></i></span><small>0 из 288 занятий</small></button>
-    <button type="button" id="btn-yanina" data-who="yanina" aria-pressed="false"><span class="name">Янина</span><span class="bar"><i></i></span><small>0 из 288 занятий</small></button>
+  <div class="tiles">
+    <button type="button" class="tile" id="btn-anton" data-go="anton"><span class="name">Антон</span><span class="bar"><i></i></span><small>0 из 288 занятий</small></button>
+    <button type="button" class="tile" id="btn-yanina" data-go="yanina"><span class="name">Янина</span><span class="bar"><i></i></span><small>0 из 288 занятий</small></button>
+    <button type="button" class="tile together" id="btn-vmeste" data-go="vmeste"><span class="name">Вместе</span><small id="vmeste-info">Игры на словах, которые вы уже прошли</small></button>
   </div>
-  <p class="sync" id="sync">Загружаю прогресс…</p>
+ </div>
+
+ <div id="view-together" hidden>
+  <div class="topbar"><button type="button" class="back" data-go="">← Назад</button><h1>Вместе</h1></div>
+  <div id="together" style="display:flex;flex-direction:column;gap:16px;margin-top:16px"></div>
+ </div>
+
+ <div id="view-person" hidden style="display:flex;flex-direction:column;gap:22px">
+  <div class="topbar"><button type="button" class="back" data-go="">← Назад</button><h1 id="person-name">Антон</h1></div>
 
   <section class="today" id="today" aria-live="polite"></section>
 
@@ -217,6 +263,9 @@ details.week.current { border-color: var(--green); }
       </ul>
     </div>
   </section>
+ </div>
+
+ <p class="sync" id="sync">Загружаю прогресс…</p>
 </div>
 
 <script>
@@ -457,11 +506,13 @@ details.week.current { border-color: var(--green); }
   function renderWho() {
     ["anton", "yanina"].forEach(who => {
       const b = $("btn-" + who), n = count(who);
-      b.setAttribute("aria-pressed", String(who === state.who));
       b.querySelector("i").style.width = (n / TOTAL * 100).toFixed(1) + "%";
       const nd = nextDay(who);
-      b.querySelector("small").textContent = n + " из " + TOTAL + " · " + (nd ? "неделя " + (nd[0] + 1) : "план пройден");
+      b.querySelector("small").textContent = n + " из " + TOTAL + " занятий · " + (nd ? "неделя " + (nd[0] + 1) : "план пройден");
     });
+    const p = pool("all");
+    $("vmeste-info").textContent = "Игры на словах, которые вы прошли · " + p.words.length + " слов" + (p.empty ? " (пока 1-я неделя)" : "");
+    $("person-name").textContent = state.who === "anton" ? "Антон" : "Янина";
   }
 
   function renderToday() {
@@ -509,21 +560,204 @@ details.week.current { border-color: var(--green); }
     el.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.onchange = () => toggle(+cb.dataset.w, +cb.dataset.d, cb.checked));
   }
 
-  function render() { renderWho(); renderToday(); renderPlan(); }
+  // ---------- games together ----------
+  // Word pool: weeks where Anton or Yanina completed at least one day. Nothing done yet -> week 1.
+  function pool(mode) {
+    const started = [];
+    for (let wi = 0; wi < W.length; wi++) {
+      if (["anton", "yanina"].some(who => Object.keys(state.done[who]).some(k => k.startsWith("w" + (wi + 1) + "d")))) started.push(wi);
+    }
+    const empty = started.length === 0;
+    let weeks = empty ? [0] : started;
+    if (mode === "last") weeks = [weeks[weeks.length - 1]];
+    const list = [];
+    weeks.forEach(wi => words(wi).forEach(x => list.push({ pt: x.pt, ru: x.ru, wi })));
+    return { weeks, words: list, empty };
+  }
+  const NAMES = ["Антон", "Янина"];
+  const shuffle = a => { const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
+  const pick = (a, n) => shuffle(a).slice(0, n);
+  const sayBtn = pt => '<button type="button" class="say" data-say="' + esc(pt) + '" aria-label="Послушать ' + esc(pt) + '">' + SPK + '</button>';
+  const fmt = s => Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+
+  const G = { mode: "all", game: null, timer: null };
+  function stopTimer() { if (G.timer) { clearInterval(G.timer); G.timer = null; } }
+  function readBest() { try { return +localStorage.getItem("pt-best-explain") || 0; } catch (e) { return 0; } }
+  function writeBest(n) { try { localStorage.setItem("pt-best-explain", String(n)); } catch (e) {} }
+
+  function duelQuestion(g) {
+    const ws = g.words, word = ws[Math.floor(Math.random() * ws.length)];
+    const dir = Math.random() < 0.5 ? "pt" : "ru"; // what is shown; answer is the other side
+    const field = dir === "pt" ? "ru" : "pt";
+    const others = shuffle(ws.filter(x => x[field] !== word[field]));
+    const opts = [word[field]];
+    for (const o of others) { if (opts.length >= 4) break; if (!opts.includes(o[field])) opts.push(o[field]); }
+    g.cur = { word, dir, opts: shuffle(opts), answer: word[field], picked: null };
+  }
+
+  function startGame(type) {
+    stopTimer();
+    const p = pool(G.mode);
+    if (type === "duel") { G.game = { type, words: p.words, q: 0, total: 10, score: [0, 0], mistakes: [] }; duelQuestion(G.game); }
+    if (type === "explain") G.game = { type, words: p.words, round: 0, phase: "ready", total: 0, got: [], skipped: [], left: 60, used: new Set() };
+    if (type === "scene") newScene(p);
+    renderTogether();
+  }
+  function newScene(p) {
+    stopTimer();
+    const wi = p.weeks[Math.floor(Math.random() * p.weeks.length)];
+    const ws = pick(p.words, 6);
+    G.game = { type: "scene", wi, roles: [ws.slice(0, 3), ws.slice(3, 6)], used: new Set(), left: 180, running: false };
+  }
+  function nextExplainWord(g) {
+    let free = g.words.filter(x => !g.used.has(x.pt));
+    if (!free.length) { g.used.clear(); free = g.words; }
+    g.word = free[Math.floor(Math.random() * free.length)];
+    g.used.add(g.word.pt);
+  }
+
+  function renderTogether() {
+    const el = $("together"), g = G.game;
+    if (!g) {
+      const p = pool(G.mode);
+      const range = p.weeks.length === 1 ? "неделя " + (p.weeks[0] + 1) : "недели: " + p.weeks.map(w => w + 1).join(", ");
+      el.innerHTML =
+        '<p>' + (p.empty ? "Вы ещё не отметили ни одного занятия, поэтому пока играем словами 1-й недели. " : "") +
+        'Слова берутся из недель, которые прошёл хотя бы один из вас. Сейчас в игре <b>' + p.words.length + ' слов</b> (' + esc(range) + ').</p>' +
+        '<div class="tabs" role="group" aria-label="Какие слова"><button type="button" data-act="mode" data-mode="all" aria-selected="' + (G.mode === "all") + '">Все пройденные</button><button type="button" data-act="mode" data-mode="last" aria-selected="' + (G.mode === "last") + '">Только последняя неделя</button></div>' +
+        '<div class="games">' +
+        '<div class="game-card"><h2>Дуэль</h2><p>Отвечаете по очереди на одном телефоне: 10 вопросов, слово по-португальски или по-русски и 4 варианта ответа. Кто наберёт больше?</p><button type="button" class="play" data-act="start" data-game="duel">Играть</button></div>' +
+        '<div class="game-card"><h2>Объясни слово</h2><p>Один объясняет слово по-португальски или жестами, не называя его, второй угадывает. 60 секунд на раунд, играете в команде. Рекорд пары: <b>' + readBest() + '</b>.</p><button type="button" class="play" data-act="start" data-game="explain">Играть</button></div>' +
+        '<div class="game-card"><h2>Сценка</h2><p>Ситуация из пройденных недель и по 3 слова каждому. Разыграйте диалог за 3 минуты и используйте все свои слова.</p><button type="button" class="play" data-act="start" data-game="scene">Играть</button></div>' +
+        '</div>';
+      return;
+    }
+    let h = '';
+    if (g.type === "duel") {
+      if (g.q >= g.total) {
+        const [a, b] = g.score;
+        h += '<div class="stage"><span class="eyebrow">Дуэль окончена</span><div class="turn">' + (a === b ? "Ничья! " + a + " : " + b : (a > b ? "Победил Антон" : "Победила Янина") + " · " + a + " : " + b) + '</div>';
+        if (g.mistakes.length) h += '<div><span class="eyebrow">Повторите эти слова</span><div class="words" style="margin-top:8px">' + g.mistakes.map(x => '<div class="word">' + sayBtn(x.pt) + '<div><b>' + esc(x.pt) + '</b><small>' + esc(x.ru) + '</small></div></div>').join("") + '</div></div>';
+        else h += '<p>Ни одной ошибки — muito bem!</p>';
+        h += '<div class="row"><button type="button" class="play" data-act="start" data-game="duel">Ещё раз</button><button type="button" class="ghost" data-act="menu">К играм</button></div></div>';
+      } else {
+        const c = g.cur, turn = g.q % 2;
+        h += '<div class="stage"><div class="row" style="justify-content:space-between"><span class="turn">Отвечает ' + NAMES[turn] + '</span><span class="score">Антон ' + g.score[0] + ' : ' + g.score[1] + ' Янина · вопрос ' + (g.q + 1) + ' из ' + g.total + '</span></div>';
+        h += '<span class="eyebrow">' + (c.dir === "pt" ? "Как это по-русски?" : "Как это по-португальски?") + '</span>';
+        h += '<div class="big-word">' + (c.dir === "pt" ? sayBtn(c.word.pt) + '<span>' + esc(c.word.pt) + '</span>' : '<span>' + esc(c.word.ru) + '</span>') + '</div>';
+        h += '<div class="opts">' + c.opts.map((o, i) => {
+          let cls = "opt";
+          if (c.picked !== null) { if (o === c.answer) cls += " right"; else if (i === c.picked) cls += " wrong"; }
+          return '<button type="button" class="' + cls + '" data-act="answer" data-i="' + i + '"' + (c.picked !== null ? " disabled" : "") + '>' + esc(o) + '</button>';
+        }).join("") + '</div>';
+        if (c.picked !== null) h += '<p>' + (c.opts[c.picked] === c.answer ? "Верно! " : "Неверно. ") + '<b>' + esc(c.word.pt) + '</b> — ' + esc(c.word.ru) + '</p><button type="button" class="play" data-act="next">Дальше</button>';
+        h += '<button type="button" class="ghost" data-act="menu">Закончить</button></div>';
+      }
+    }
+    if (g.type === "explain") {
+      const ex = g.round % 2, gu = 1 - ex;
+      if (g.phase === "ready") {
+        h += '<div class="stage"><span class="eyebrow">Раунд ' + (g.round + 1) + ' · очки команды: ' + g.total + '</span><div class="turn">Объясняет ' + NAMES[ex] + ', угадывает ' + NAMES[gu] + '</div>' +
+          '<p>' + NAMES[ex] + ' держит телефон так, чтобы ' + NAMES[gu] + ' не видел' + (gu === 1 ? "а" : "") + ' экран. Объясняйте по-португальски, показывайте жестами, но не называйте само слово. Угадывать нужно по-португальски.</p>' +
+          '<div class="row"><button type="button" class="play" data-act="go">Старт — 60 секунд</button><button type="button" class="ghost" data-act="menu">Закончить</button></div></div>';
+      } else if (g.phase === "play") {
+        h += '<div class="stage"><div class="row" style="justify-content:space-between"><span class="timer' + (g.left <= 10 ? " low" : "") + '" id="ex-timer">' + fmt(g.left) + '</span><span class="score">угадано: ' + g.got.length + '</span></div>' +
+          '<div class="big-word"><span>' + esc(g.word.pt) + '</span></div><p class="muted">' + esc(g.word.ru) + '</p>' +
+          '<div class="row"><button type="button" class="play" data-act="got">Угадал' + (gu === 1 ? "а" : "") + '</button><button type="button" class="ghost" data-act="skip">Пропустить</button></div></div>';
+      } else {
+        h += '<div class="stage"><span class="eyebrow">Раунд ' + (g.round + 1) + ' окончен</span><div class="turn">Угадано: ' + g.got.length + ' · всего у команды: ' + g.total + '</div>';
+        if (g.total >= readBest() && g.total > 0) h += '<p class="tip">Новый рекорд пары: ' + g.total + '!</p>';
+        const all = g.got.map(x => [x, true]).concat(g.skipped.map(x => [x, false]));
+        if (all.length) h += '<div class="words">' + all.map(([x, ok]) => '<div class="word">' + sayBtn(x.pt) + '<div><b>' + (ok ? "" : "✗ ") + esc(x.pt) + '</b><small>' + esc(x.ru) + '</small></div></div>').join("") + '</div>';
+        h += '<div class="row"><button type="button" class="play" data-act="nextround">Следующий раунд: объясняет ' + NAMES[gu] + '</button><button type="button" class="ghost" data-act="menu">Закончить</button></div></div>';
+      }
+    }
+    if (g.type === "scene") {
+      const w = W[g.wi];
+      h += '<div class="stage"><span class="eyebrow">Ситуация из недели ' + (g.wi + 1) + ' «' + esc(w[0]) + '»</span><div class="turn">' + esc(w[5]) + '</div>' +
+        '<p class="muted">Говорите только по-португальски. Нажмите на слово, когда использовали его в диалоге.</p><div class="roles">' +
+        g.roles.map((ws, r) => '<div class="role"><b>' + NAMES[r] + '</b><div class="chips">' + ws.map(x => '<button type="button" class="chip' + (g.used.has(r + x.pt) ? " used" : "") + '" data-act="use" data-k="' + esc(r + x.pt) + '">' + esc(x.pt) + '</button>').join("") + '</div><small class="muted">' + ws.map(x => esc(x.pt) + " — " + esc(x.ru)).join(" · ") + '</small></div>').join("") +
+        '</div><div class="row"><span class="timer' + (g.left <= 20 ? " low" : "") + '" id="sc-timer">' + fmt(g.left) + '</span>' +
+        '<button type="button" class="play" data-act="sctimer">' + (g.running ? "Пауза" : (g.left < 180 ? "Продолжить" : "Старт — 3 минуты")) + '</button></div>' +
+        (g.used.size === 6 ? '<p class="tip">Все 6 слов использованы — отлично!</p>' : '') +
+        '<div class="row"><button type="button" class="ghost" data-act="newscene">Новая сценка</button><button type="button" class="ghost" data-act="menu">К играм</button></div></div>';
+    }
+    el.innerHTML = h;
+  }
+
+  function endExplainRound() {
+    const g = G.game; stopTimer();
+    g.total += g.got.length; g.phase = "end";
+    if (g.total > readBest()) writeBest(g.total);
+    renderTogether();
+  }
+
+  $("together").addEventListener("click", e => {
+    const b = e.target.closest("[data-act]"); if (!b) return;
+    const g = G.game, act = b.dataset.act;
+    if (act === "mode") { G.mode = b.dataset.mode; renderTogether(); return; }
+    if (act === "start") { startGame(b.dataset.game); return; }
+    if (act === "menu") { stopTimer(); G.game = null; renderTogether(); return; }
+    if (!g) return;
+    if (act === "answer" && g.cur.picked === null) {
+      g.cur.picked = +b.dataset.i;
+      if (g.cur.opts[g.cur.picked] === g.cur.answer) g.score[g.q % 2]++; else g.mistakes.push(g.cur.word);
+      speak(g.cur.word.pt);
+    }
+    if (act === "next") { g.q++; if (g.q < g.total) duelQuestion(g); }
+    if (act === "go") {
+      g.phase = "play"; g.left = 60; g.got = []; g.skipped = []; nextExplainWord(g);
+      G.timer = setInterval(() => {
+        g.left--; const t = $("ex-timer");
+        if (t) { t.textContent = fmt(g.left); t.classList.toggle("low", g.left <= 10); }
+        if (g.left <= 0) endExplainRound();
+      }, 1000);
+    }
+    if (act === "got") { g.got.push(g.word); nextExplainWord(g); }
+    if (act === "skip") { g.skipped.push(g.word); nextExplainWord(g); }
+    if (act === "nextround") { g.round++; g.phase = "ready"; }
+    if (act === "use") { const k = b.dataset.k; g.used.has(k) ? g.used.delete(k) : g.used.add(k); }
+    if (act === "newscene") { newScene(pool(G.mode)); }
+    if (act === "sctimer") {
+      if (g.running) { stopTimer(); g.running = false; }
+      else if (g.left > 0) {
+        g.running = true;
+        G.timer = setInterval(() => {
+          g.left--; const t = $("sc-timer");
+          if (t) { t.textContent = fmt(g.left); t.classList.toggle("low", g.left <= 20); }
+          if (g.left <= 0) { stopTimer(); g.running = false; renderTogether(); }
+        }, 1000);
+      }
+    }
+    renderTogether();
+  });
+
+  // ---------- views: start / person / together ----------
+  function route() {
+    const h = location.hash.replace("#", "");
+    const view = h === "anton" || h === "yanina" ? "person" : h === "vmeste" ? "together" : "start";
+    if (view === "person" && state.who !== h) { state.who = h; openWeeks = null; }
+    if (view !== "together") { stopTimer(); G.game = null; }
+    ["start", "person", "together"].forEach(v => { $("view-" + v).hidden = v !== view; });
+    render();
+    window.scrollTo(0, 0);
+  }
+  window.addEventListener("hashchange", route);
+
+  function render() { renderWho(); renderToday(); renderPlan(); if (!$("view-together").hidden && !G.game) renderTogether(); }
 
   // ---------- events ----------
-  document.querySelectorAll("#who button").forEach(b => b.onclick = () => {
-    state.who = b.dataset.who; openWeeks = null;
-    try { localStorage.setItem("pt-who", state.who); } catch (e) {}
-    render();
+  document.addEventListener("click", e => {
+    const go = e.target.closest("[data-go]");
+    if (go) { location.hash = go.dataset.go; if (!go.dataset.go) route(); return; }
+    const b = e.target.closest("[data-say]"); if (b) speak(b.dataset.say);
   });
-  document.addEventListener("click", e => { const b = e.target.closest("[data-say]"); if (b) speak(b.dataset.say); });
   document.querySelectorAll('[role="tab"]').forEach(t => t.onclick = () => {
     document.querySelectorAll('[role="tab"]').forEach(x => x.setAttribute("aria-selected", String(x === t)));
     ["plan", "exam", "how"].forEach(n => $("pane-" + n).hidden = n !== t.dataset.tab);
   });
 
-  render();
+  route();
   load();
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") load(); });
   setInterval(() => { if (document.visibilityState === "visible") load(); }, 60000);
