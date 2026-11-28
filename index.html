@@ -145,6 +145,7 @@ details.week.current { border-color: var(--green); }
 .turn { font-family: var(--display); font-weight: 800; font-size: 22px; }
 .score { font-variant-numeric: tabular-nums; color: var(--muted); }
 .big-word { font-family: var(--display); font-weight: 800; font-size: clamp(30px, 9vw, 44px); line-height: 1.1; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; overflow-wrap: anywhere; }
+.phrases { display: grid; gap: 8px; }
 .warm { background: var(--bg); border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
 .warm p { margin: 0; }
 .golink { font-weight: 600; }
@@ -446,11 +447,63 @@ details.week.current { border-color: var(--pink); }
     "iJvmxVdDAKw", "17iLpZUY5_U", "BdtCPqglUeQ", "XxoN0qUkwaQ", "dwCxpkW6USg", "96-XxlQCMrI", "-haGTkx8OJo", "VCbBiiWjdRY"
   ];
 
+  // Three model phrases per week ("pt=ru;pt=ru;pt=ru"), same order as W. Add new ones only at the end.
+  const PHRASES = [
+    "Oi, tudo bem? — Tudo bem, e você?=Привет, как дела? — Нормально, а у тебя?;Obrigado! — De nada.=Спасибо! — Не за что.;Tchau, até amanhã!=Пока, до завтра!",
+    "Meu nome é Anton. E o seu?=Меня зовут Антон. А тебя?;Eu sou da Rússia.=Я из России.;A gente mora em São Paulo.=Мы живём в Сан-Паулу.",
+    "Quanto custa o café?=Сколько стоит кофе?;Custa cinco reais.=Стоит пять реалов.;Dois pães de queijo, por favor.=Две сырные булочки, пожалуйста.",
+    "Eu sou russo e estou cansado.=Я русский, и я устал.;Ela está grávida.=Она беременна.;A gente está aqui de férias.=Мы здесь в отпуске.",
+    "Onde fica o banheiro?=Где туалет?;Tem uma farmácia nesta rua?=На этой улице есть аптека?;O mercado fica perto de casa.=Магазин рядом с домом.",
+    "Eu moro e trabalho no Rio.=Я живу и работаю в Рио.;Você gosta de café?=Тебе нравится кофе?;A gente precisa de ajuda.=Нам нужна помощь.",
+    "Eu queria um suco de laranja.=Я бы хотел апельсиновый сок.;Tem pão de queijo?=Есть сырные булочки?;A conta, por favor.=Счёт, пожалуйста.",
+    "Que horas são? — São três horas.=Который час? — Три часа.;Amanhã de manhã eu trabalho.=Завтра утром я работаю.;A gente se vê na segunda-feira.=Увидимся в понедельник.",
+    "Desculpa, não entendi.=Извините, я не понял.;Pode repetir mais devagar?=Можете повторить помедленнее?;A gente come feijão todo dia.=Мы едим фасоль каждый день.",
+    "Débito ou crédito? — Pix, por favor.=Дебет или кредит? — Через Pix, пожалуйста.;Quer sacola? — Não, obrigado.=Нужен пакет? — Нет, спасибо.;Quanto custa o quilo do tomate?=Сколько стоит килограмм помидоров?",
+    "Vou pegar o ônibus.=Я поеду на автобусе.;Onde fica o ponto de ônibus?=Где автобусная остановка?;É longe daqui?=Это далеко отсюда?",
+    "Quanto é o aluguel?=Сколько стоит аренда?;O condomínio está incluído?=Плата за дом включена?;Precisa de fiador?=Нужен поручитель?",
+    "Ontem eu comprei frutas.=Вчера я купил фрукты.;A gente chegou semana passada.=Мы приехали на прошлой неделе.;Você já almoçou? — Ainda não.=Ты уже пообедал? — Ещё нет.",
+    "Eu fui à praia no sábado.=В субботу я ходил на пляж.;Eu fiz o jantar.=Я приготовил ужин.;Eu vi um filme ótimo.=Я посмотрел отличный фильм.",
+    "Hoje está muito calor.=Сегодня очень жарко.;Está chovendo, leva o guarda-chuva.=Идёт дождь, возьми зонт.;Não esquece o protetor solar!=Не забудь солнцезащитный крем!",
+    "Como faço para abrir uma conta?=Как мне открыть счёт?;Eu preciso de um CPF.=Мне нужен CPF.;Quero comprar um chip pré-pago.=Хочу купить предоплаченную сим-карту.",
+    "Cuidado com o celular!=Осторожно с телефоном!;Não anda sozinho à noite.=Не ходи один ночью.;Esse bairro é tranquilo?=Этот район спокойный?",
+    "Valeu, cara!=Спасибо, чувак!;Tá bom, beleza.=Ладно, договорились.;Legal, né?=Классно, да?",
+    "Estou com dor de cabeça.=У меня болит голова.;Ela está com enjoo.=Её тошнит.;Estou com febre desde ontem.=У меня температура со вчерашнего дня.",
+    "Eu queria marcar uma consulta.=Я бы хотел записаться на приём.;Vocês aceitam plano de saúde?=Вы принимаете медстраховку?;Onde fica o posto de saúde?=Где поликлиника?",
+    "Estou com doze semanas.=У меня 12 недель беременности.;Quais exames eu preciso fazer?=Какие анализы мне нужно сдать?;Quando é o próximo ultrassom?=Когда следующее УЗИ?",
+    "A bolsa estourou!=Отошли воды!;As contrações estão a cada cinco minutos.=Схватки каждые пять минут.;Eu sou o acompanhante dela.=Я её сопровождающий.",
+    "Esse remédio pode tomar grávida?=Это лекарство можно беременным?;Tome de oito em oito horas.=Принимайте каждые 8 часов.;Precisa de receita?=Нужен рецепт?",
+    "O bebê dormiu bem.=Малыш хорошо поспал.;Preciso trocar a fralda.=Мне нужно поменять подгузник.;Quando é a próxima vacina?=Когда следующая прививка?",
+    "Eu vim registrar meu filho.=Я пришёл зарегистрировать сына.;Aqui está a DNV do hospital.=Вот справка из роддома.;Qual é o sobrenome do bebê?=Какая фамилия у малыша?",
+    "Eu tenho agendamento às dez.=У меня запись на десять.;Vim pedir residência por reunião familiar.=Я подаю на ВНЖ по воссоединению семьи.;Aqui estão os meus documentos.=Вот мои документы.",
+    "Bom dia, o senhor pode me ajudar?=Добрый день, вы можете мне помочь?;Gostaria de remarcar a consulta.=Я хотел бы перенести приём.;Atenciosamente, Anton.=С уважением, Антон.",
+    "Onde eu pego a senha?=Где взять номерок?;Preciso de uma cópia autenticada?=Нужна заверенная копия?;Onde eu assino?=Где мне подписать?",
+    "Quando eu era criança, eu morava em Moscou.=Когда я был ребёнком, я жил в Москве.;Eu sempre jogava futebol.=Я всегда играл в футбол.;Antigamente a gente lia mais.=Раньше мы больше читали.",
+    "Eu estava em casa quando ele ligou.=Я был дома, когда он позвонил.;De repente começou a chover.=Вдруг пошёл дождь.;No fim, deu tudo certo.=В конце всё получилось.",
+    "Daqui a um ano, vou morar no Brasil.=Через год я буду жить в Бразилии.;Se eu pudesse, moraria perto da praia.=Если бы я мог, жил бы у пляжа.;Talvez a gente compre um carro.=Может быть, мы купим машину.",
+    "Acho que o SUS funciona bem.=Я думаю, что SUS работает хорошо.;Concordo com você.=Согласен с тобой.;Por um lado é caro, por outro lado é seguro.=С одной стороны дорого, с другой — надёжно.",
+    "Espero que o bebê seja saudável.=Надеюсь, что малыш будет здоровым.;É importante que você descanse.=Важно, чтобы ты отдыхала.;Quero que a gente viaje mais.=Хочу, чтобы мы больше путешествовали.",
+    "Eu trabalho como freelancer.=Я работаю фрилансером.;Qual é o salário?=Какая зарплата?;Vou abrir um MEI.=Я открою ИП (MEI).",
+    "Segundo a pesquisa, os preços subiram.=Согласно исследованию, цены выросли.;O governo anunciou um aumento.=Правительство объявило о повышении.;Você viu a notícia de hoje?=Ты видел сегодняшнюю новость?",
+    "Eu torço para o Flamengo.=Я болею за «Фламенго».;Vamos a uma festa junina?=Пойдём на festa junina?;Que saudade de casa!=Как я скучаю по дому!",
+    "Além disso, o clima é ótimo.=Кроме того, климат отличный.;No entanto, a burocracia é difícil.=Однако бюрократия сложная.;Portanto, vale a pena.=Поэтому оно того стоит.",
+    "Eu me mudei para o Brasil há um ano.=Я переехал в Бразилию год назад.;Meu maior desafio foi a língua.=Самой большой трудностью был язык.;Pretendo fazer o Celpe-Bras.=Я собираюсь сдавать Celpe-Bras.",
+    "O exame tem uma parte escrita e uma oral.=В экзамене есть письменная и устная часть.;Quem é o interlocutor?=Кто адресат?;Qual é o propósito do texto?=Какая цель текста?",
+    "Segundo o vídeo, o projeto ajuda as famílias.=Согласно видео, проект помогает семьям.;O entrevistado destaca três pontos.=Интервьюируемый выделяет три момента.;O vídeo aborda a questão da saúde.=Видео затрагивает тему здоровья.",
+    "Cerca de metade das pessoas concorda.=Около половины людей согласны.;O número aumentou trinta por cento.=Число выросло на 30 процентов.;Os dados mostram que a situação melhorou.=Данные показывают, что ситуация улучшилась.",
+    "Prezados senhores,=Уважаемые господа,;Venho por meio desta fazer uma reclamação.=Настоящим обращаюсь с жалобой.;Aguardo retorno. Cordialmente, Anton.=Жду ответа. С уважением, Антон.",
+    "Neste artigo, defendo que morar no Brasil vale a pena.=В этой статье я утверждаю, что жить в Бразилии стоит.;O principal argumento é a qualidade de vida.=Главный аргумент — качество жизни.;Convido o leitor a refletir.=Приглашаю читателя задуматься.",
+    "Em resumo, o texto informa que a vacina é gratuita.=Вкратце, текст сообщает, что прививка бесплатная.;Reescrevi o texto para os pais.=Я переписал текст для родителей.;O objetivo é orientar o leitor.=Цель — дать рекомендации читателю.",
+    "Eu me formei em economia.=Я окончил вуз по экономике.;Nas horas vagas, eu gosto de cozinhar.=В свободное время я люблю готовить.;Me interesso pela cultura brasileira.=Меня интересует бразильская культура.",
+    "A imagem mostra uma família na praia.=На изображении семья на пляже.;O que me chama atenção é a alegria das pessoas.=Мне бросается в глаза радость людей.;No meu país é diferente.=В моей стране по-другому.",
+    "Primeiro eu faço um rascunho.=Сначала я пишу черновик.;Depois eu reviso o texto.=Потом я проверяю текст.;Preciso controlar o tempo.=Нужно следить за временем.",
+    "Já fiz a inscrição no exame.=Я уже зарегистрировался на экзамен.;O posto aplicador fica em São Paulo.=Экзаменационный центр в Сан-Паулу.;Quero tirar o nível intermediário.=Хочу получить уровень Intermediário."
+  ];
   const DAYS = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
   const TOTAL = W.length * 6;
 
   function phaseOf(w) { return PHASES.find(p => w >= p.weeks[0] && w <= p.weeks[1]); }
   function words(i) { return W[i][3].split(";").map(s => { const [pt, ru] = s.split("="); return { pt, ru }; }); }
+  function phrases(i) { return PHRASES[i] ? PHRASES[i].split(";").map(s => { const [pt, ru] = s.split("="); return { pt, ru }; }) : []; }
   function videoLink(wi) { return VIDEOS[wi] ? "https://www.youtube.com/watch?v=" + VIDEOS[wi] : null; }
 
   // Each day is a 20-minute session: [minutes, text] steps.
@@ -458,30 +511,31 @@ details.week.current { border-color: var(--pink); }
     const w = W[wi], p = phaseOf(wi + 1);
     switch (d) {
       case 0: return { title: "Новая тема", steps: [
-        [10, "Посмотрите видео-урок недели: " + w[1] + "."],
-        [5, "Послушайте слова недели: нажимайте на динамик и повторяйте вслух."],
-        [5, "Разминка на сайте: угадайте слова на слух."]], warm: true,
-        links: videoLink(wi) ? [["Смотреть видео-урок недели", videoLink(wi)]] : [] };
+        [10, "Видео-урок. Нажмите «▶ Смотреть видео-урок» ниже и включите субтитры (кнопка CC). Смотрите 10 минут, дальше можно не досматривать. Ваша цель — понять одно правило: " + w[1] + ". На каждом примере в видео ставьте паузу и повторяйте его вслух."],
+        [5, "Фразы недели (ниже). Нажмите на динамик у каждой фразы и повторите её вслух 3 раза, пока не скажете без подглядывания."],
+        [5, "Разминка: нажмите «Начать разминку» и угадайте 8 слов."]], warm: true,
+        links: videoLink(wi) ? [["Смотреть видео-урок", videoLink(wi)]] : [] };
       case 1: return { title: "Практика правила", steps: [
-        [5, "Разминка на сайте: слова сами повторяются."],
-        [10, "Напишите 5 своих предложений по правилу недели — вставьте в них слова недели."],
-        [5, "Прочитайте их вслух, медленно и чётко."]], warm: true };
+        [5, "Разминка: нажмите «Начать разминку»."],
+        [10, "Переделайте фразы недели под себя: в каждой замените 1–2 слова, чтобы было про вашу жизнь. Сделайте так 5 предложений, напишите в заметках телефона. Например, «" + (phrases(wi)[0] || { pt: "" }).pt + "» — поменяйте имя, место или число."],
+        [5, "Прочитайте свои 5 предложений вслух, медленно и чётко. Сомневаетесь в слове — нажмите на динамик у слов недели и сверьтесь."]], warm: true };
       case 2: return { title: "Слушаем", steps: [
-        [5, "Разминка на сайте: слова сами повторяются."],
-        [10, "Слушаем: " + p.listen + "."],
-        [5, "Повторяйте за диктором фразу за фразой (shadowing)."]], warm: true,
+        [5, "Разминка: нажмите «Начать разминку»."],
+        [10, "Слушаем: " + p.listen + ". Откройте ссылку ниже и выберите любое видео до 10 минут. Задача — не понять всё, а уловить, о чём речь, и услышать хотя бы 3 знакомых слова."],
+        [5, "Повтор за диктором: выберите кусок на 1 минуту. После каждой фразы ставьте паузу и повторяйте вслух, копируя интонацию."]], warm: true,
         links: p.listenUrl ? [["Открыть: " + p.listen.split(":")[0], p.listenUrl]] : [] };
       case 3: return { title: "Читаем", steps: [
-        [5, "Разминка на сайте: слова сами повторяются."],
-        [10, "Читаем: " + p.read + "."],
-        [5, "Прочитайте вслух 3 фразы из текста, которые понравились."]], warm: true,
-        links: p.readUrl ? [["Открыть: " + p.read.split(":")[0], p.readUrl]] : (videoLink(wi) ? [["Видео-урок недели", videoLink(wi)]] : []) };
+        [5, "Разминка: нажмите «Начать разминку»."],
+        [10, "Читаем: " + p.read + ". Читайте вслух. Незнакомые слова не выписывайте и не ищите все подряд: догадывайтесь по смыслу, переводчик — максимум для 3 слов."],
+        [5, "Найдите в тексте 3 фразы, которые поняли. Прочитайте их вслух и скажите, что они значат."]], warm: true,
+        links: p.readUrl ? [["Открыть: " + p.read.split(":")[0], p.readUrl]] : (videoLink(wi) ? [["Видео-урок недели (текст под видео)", videoLink(wi)]] : []) };
       case 4: return { title: "Пишем и говорим", steps: [
-        [5, "Разминка на сайте: слова сами повторяются."],
-        [10, w[4] + "."],
-        [5, "Прочитайте текст на диктофон и послушайте себя."]], warm: true };
+        [5, "Разминка: нажмите «Начать разминку»."],
+        [10, "Письмо: " + w[4] + ". Пишите в заметках телефона. Берите фразы недели как образец — можно прямо копировать начало фразы."],
+        [5, "Запишите голосовое: прочитайте свой текст вслух на диктофон, послушайте и найдите 1 место, где споткнулись. Перечитайте его ещё раз."]], warm: true };
       default: return { title: "Вместе", steps: [
-        [20, w[5] + ". Только по-португальски, подглядывать в слова недели можно."]], together: true };
+        [5, "Разогрев: по очереди скажите друг другу фразы недели (ниже), второй отвечает."],
+        [15, w[5] + ". Только по-португальски; подглядывать в слова и фразы недели можно."]], together: true };
     }
   }
 
@@ -724,6 +778,9 @@ details.week.current { border-color: var(--pink); }
     html += '<ol class="steps">' + ds.steps.map(s => '<li><span class="min">' + s[0] + '<span>мин</span></span><span>' + esc(s[1]) + '</span></li>').join("") + '</ol>';
     (ds.links || []).forEach(l => { html += '<p><a class="golink" href="' + esc(l[1]) + '" target="_blank" rel="noopener">▶ ' + esc(l[0]) + '</a></p>'; });
     if (ds.warm) html += '<div id="warm">' + warmHTML(who, wi) + '</div>';
+    const ph = phrases(wi);
+    if (ph.length) html += '<div><span class="eyebrow">Фразы недели — скажите вслух</span></div><div class="phrases">' + ph.map(x =>
+      '<div class="word">' + sayBtn(x.pt) + '<div><b>' + esc(x.pt) + '</b><small>' + esc(x.ru) + '</small></div></div>').join("") + '</div>';
     html += '<div><span class="eyebrow">Слова недели</span></div><div class="words">' + words(wi).map((x, i) =>
       '<div class="word"><button type="button" class="say" data-say="' + esc(x.pt) + '" aria-label="Послушать ' + esc(x.pt) + '">' + SPK + '</button><div><b>' + esc(x.pt) + '</b><small>' + esc(x.ru) + '</small></div></div>').join("") + '</div>';
     if (ds.together) html += '<p class="tip">Суббота — занятие вдвоём. Отметьте его каждый в своём профиле.</p>';
@@ -744,6 +801,7 @@ details.week.current { border-color: var(--pink); }
         const w = W[wi];
         const dots = DAYS.map((_, d) => '<i class="' + (state.done[who][key(wi, d)] ? "on" : "") + '"></i>').join("");
         html += '<details class="week' + (wi === cur ? " current" : "") + '" data-w="' + wi + '"' + (openWeeks.has(wi) ? " open" : "") + '><summary><span class="wnum">' + String(wi + 1).padStart(2, "0") + '</span><span class="wtitle"><b>' + esc(w[0]) + '</b><br><small class="muted">' + esc(w[1]) + '</small></span><span class="dots" aria-label="Сделано дней">' + dots + '</span></summary><div class="wbody">';
+        if (phrases(wi).length) html += '<p class="muted"><b>Фразы:</b> ' + phrases(wi).map(x => esc(x.pt) + " — " + esc(x.ru)).join(" · ") + '</p>';
         html += '<p class="muted"><b>Слова:</b> ' + words(wi).map(x => esc(x.pt) + " — " + esc(x.ru)).join(" · ") + '</p>';
         for (let d = 0; d < 6; d++) {
           const ds = daySteps(wi, d), id = "c-" + key(wi, d), on = !!state.done[who][key(wi, d)];
