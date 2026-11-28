@@ -6,6 +6,8 @@
 - `index.html` — the whole site (plan data, UI, logic), plain HTML/CSS/JS, no build.
   Views by URL hash: start screen (Антон / Янина / Вместе), `#anton` / `#yanina` personal plan, `#vmeste` games
   (Дуэль, Объясни слово, Сценка) on words from weeks either person has started.
+  `VIDEOS` — one checked YouTube video id per week, same order as `W`. No Anki: daily on-site warm-up
+  (8 words, current + older weeks; missed words come back more often, kept in localStorage `pt-miss`, not in the DB).
 - `config.js` — Supabase URL and anon public key (public by design).
 - `supabase.sql` — table `progress` (one row per person: `who`, `done` jsonb) with RLS for the anon key.
 - `supabase-history.sql` — trigger copying the old row into `progress_history` before each update (restore steps inside).
@@ -19,7 +21,7 @@
 - Check JS syntax: extract the `<script>` block and run `node --check`.
 
 ## Rules
-- Only Brazilian Portuguese content (not European).
+- Only Brazilian Portuguese content (not European) — including linked videos and channels.
 - No passwords or accounts: profile is just a choice of Anton / Yanina.
 - Only the anon public key goes into `config.js`; never the service_role key.
 - Database changes go through `supabase.sql` and are shown to the user before running.

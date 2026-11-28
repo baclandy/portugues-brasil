@@ -145,6 +145,9 @@ details.week.current { border-color: var(--green); }
 .turn { font-family: var(--display); font-weight: 800; font-size: 22px; }
 .score { font-variant-numeric: tabular-nums; color: var(--muted); }
 .big-word { font-family: var(--display); font-weight: 800; font-size: clamp(30px, 9vw, 44px); line-height: 1.1; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; overflow-wrap: anywhere; }
+.warm { background: var(--bg); border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.warm p { margin: 0; }
+.golink { font-weight: 600; }
 .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 @media (max-width: 460px) { .opts { grid-template-columns: 1fr; } }
 .opt { border: 2px solid var(--line); background: var(--bg); color: var(--fg); border-radius: 12px; padding: 14px; text-align: left; font-size: 16px; }
@@ -326,7 +329,7 @@ details.week.current { border-color: var(--pink); }
     <div class="card">
       <h2>Одно занятие = 20 минут</h2>
       <ol>
-        <li><b>5 минут — карточки Anki.</b> Бесплатное приложение с повторением слов. Добавляйте туда 6 слов недели.</li>
+        <li><b>5 минут — разминка со словами прямо здесь, на сайте.</b> Слушаете слово и выбираете перевод. Ничего записывать и зубрить не нужно: слова недели и старые слова возвращаются сами, а те, где ошиблись, — чаще, пока не запомнятся.</li>
         <li><b>10 минут — главное задание дня.</b> Урок, видео, текст или письмо.</li>
         <li><b>5 минут — вслух.</b> Повторять за диктором, проговаривать свои фразы, записывать себя на диктофон.</li>
       </ol>
@@ -339,10 +342,9 @@ details.week.current { border-color: var(--pink); }
     <div class="card">
       <h2>Бесплатные материалы</h2>
       <ul>
-        <li><b>Anki</b> — карточки для слов.</li>
         <li><b>Speaking Brazilian</b> (YouTube) — произношение и разговорная речь.</li>
         <li><b>Easy Portuguese</b> (YouTube) — уличные интервью в Бразилии с субтитрами.</li>
-        <li><b>Portuguese With Carla</b> — подкаст и видео для начинающих и среднего уровня.</li>
+        <li><b>Real Brazilian Portuguese</b>, <b>Plain Portuguese</b> (YouTube) — диалоги из жизни и понятные объяснения грамматики.</li>
         <li><b>Tá Falado</b> — подкаст с текстами, хорош для разбора произношения.</li>
         <li><b>G1</b>, <b>Jornal Nacional</b> — новости с 4-й фазы.</li>
         <li><b>Acervo Celpe-Bras</b> — все прошлые экзамены.</li>
@@ -362,23 +364,23 @@ details.week.current { border-color: var(--pink); }
 
   const PHASES = [
     { name: "Звуки и выживание", lvl: "A1", weeks: [1, 8],
-      listen: "Speaking Brazilian (YouTube): видео по теме недели",
-      read: "простой диалог по теме (Duolingo или урок на YouTube)" },
+      listen: "Speaking Brazilian (YouTube): любое короткое видео с канала", listenUrl: "https://www.youtube.com/@SpeakingBrazilian/videos",
+      read: "простой диалог по теме (урок Duolingo или текст под видео недели)" },
     { name: "Быт в Бразилии", lvl: "A2", weeks: [9, 18],
-      listen: "Easy Portuguese (YouTube): уличное интервью с субтитрами",
-      read: "эпизод Tá Falado: прочитать текст диалога" },
+      listen: "Easy Portuguese (YouTube): уличное интервью с субтитрами", listenUrl: "https://www.youtube.com/@EasyPortugueseVideos/videos",
+      read: "эпизод Tá Falado: прочитать текст диалога", readUrl: "https://coerll.utexas.edu/brazilpod/tafalado/" },
     { name: "Беременность, врачи, документы", lvl: "A2+", weeks: [19, 28],
-      listen: "Portuguese With Carla: эпизод подкаста",
-      read: "страница gov.br или Ministério da Saúde по теме недели" },
+      listen: "Real Brazilian Portuguese (YouTube): диалог из жизни — у врача, в аптеке, в офисе", listenUrl: "https://www.youtube.com/@realbrazilianportuguese/videos",
+      read: "страница Ministério da Saúde на gov.br по теме недели", readUrl: "https://www.gov.br/saude/pt-br" },
     { name: "Жизнь и общение", lvl: "B1", weeks: [29, 38],
-      listen: "5 минут Jornal Nacional или подкаста о Бразилии",
-      read: "одна короткая новость на G1" },
+      listen: "5 минут Jornal Nacional", listenUrl: "https://g1.globo.com/jornal-nacional/",
+      read: "одна короткая новость на G1", readUrl: "https://g1.globo.com/" },
     { name: "Формат CELPE-Bras", lvl: "B1+", weeks: [39, 48],
-      listen: "видео или аудио из Acervo Celpe-Bras",
-      read: "текст из прошлого экзамена в Acervo Celpe-Bras" }
+      listen: "видео или аудио из Acervo Celpe-Bras", listenUrl: "https://www.ufrgs.br/acervocelpebras",
+      read: "текст из прошлого экзамена в Acervo Celpe-Bras", readUrl: "https://www.ufrgs.br/acervocelpebras" }
   ];
 
-  // [title, grammar/focus, youtube query, words "pt=ru;...", writing task, together task]
+  // [title, grammar/focus, video topic (old search text, unused), words "pt=ru;...", writing task, together task]
   const W = [
     ["Звуки бразильского", "Алфавит, носовые ã/õ, «te/de» звучат как «чи/джи», «r» в начале как «х»", "brazilian portuguese pronunciation for beginners", "olá=привет;tchau=пока;obrigado / obrigada=спасибо (говорит м / ж);por favor=пожалуйста;desculpa=извините;tudo bem?=как дела?", "Напишите 3 фразы: поздороваться, назвать имя, попрощаться", "Поздоровайтесь и попрощайтесь 10 раз разными способами, следите за «чи/джи»"],
     ["Знакомство", "Местоимения; «a gente» = «мы» в разговорной речи; Meu nome é…, Sou da Rússia", "brazilian portuguese introduce yourself", "eu=я;você=ты / вы;a gente=мы (разг.);ele / ela=он / она;nome=имя;de onde?=откуда?", "Напишите о себе 5 предложений: имя, откуда, где живёте", "Познакомьтесь «впервые»: один — бразилец на пляже, другой — турист"],
@@ -434,37 +436,50 @@ details.week.current { border-color: var(--pink); }
     ["Пробное интервью и запись", "Полное интервью 20 минут + регистрация на экзамен", "celpe-bras inscrição", "inscrição=регистрация на экзамен;posto aplicador=экзаменационный центр;certificado=сертификат;nível=уровень;intermediário=средний уровень;aprovado=сдал", "Напишите себе план: дата экзамена, центр, что подтянуть", "Полное пробное интервью: 5 минут о себе + элемент, по очереди"]
   ];
 
+  // One checked YouTube lesson per week, same order as W (week 1 first). Add new ones only at the end.
+  const VIDEOS = [
+    "NwBupoM1jzM", "XI7ESbizjzU", "RFwm4pOATzU", "sXstbqoiOEk", "tIm22oMufUY", "cIyhWXO-1y8", "Oyyfzh8mN6s", "bcHMafWAOcA",
+    "BsMTXxCAUk0", "9-hfHqbrBGU", "wwDNi64C4Ow", "idLQUDCBuL4", "ImLqQUFl2b4", "4pxD0qeL900", "eONe1UNR1f8", "SEWiWbiuGvg",
+    "lVXTQQwZjOs", "ahC3XHfsOGU", "2XqQAbhiC_E", "MzO9KyktPKc", "lBQ8wGSZyAw", "xbRd-4R3HsU", "2GKQpmX9zFo", "pZLrSEEsuP0",
+    "F8ueaVa8_Uc", "LxeTK26N3So", "7JtE3OIogs0", "qiLHliQjgWw", "J5xCJnpftSA", "oidJ0TOL6oM", "eDjNAgKWU4Y", "ungXbbMkLaE",
+    "ptm4mWa613E", "1ZuJwKhpkiY", "y9PUJJOlu0M", "YXTqFrKQBsM", "u4GZUS4NhVg", "QviLRRwIfb8", "W6A6jWyxsiE", "0KWsrBAWy88",
+    "iJvmxVdDAKw", "17iLpZUY5_U", "BdtCPqglUeQ", "XxoN0qUkwaQ", "dwCxpkW6USg", "96-XxlQCMrI", "-haGTkx8OJo", "VCbBiiWjdRY"
+  ];
+
   const DAYS = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
   const TOTAL = W.length * 6;
 
   function phaseOf(w) { return PHASES.find(p => w >= p.weeks[0] && w <= p.weeks[1]); }
   function words(i) { return W[i][3].split(";").map(s => { const [pt, ru] = s.split("="); return { pt, ru }; }); }
-  function ytLink(q) { return "https://www.youtube.com/results?search_query=" + encodeURIComponent(q); }
+  function videoLink(wi) { return VIDEOS[wi] ? "https://www.youtube.com/watch?v=" + VIDEOS[wi] : null; }
 
   // Each day is a 20-minute session: [minutes, text] steps.
   function daySteps(wi, d) {
     const w = W[wi], p = phaseOf(wi + 1);
     switch (d) {
       case 0: return { title: "Новая тема", steps: [
-        [10, "Посмотрите урок: " + w[1] + "."],
-        [5, "Добавьте 6 слов недели в Anki."],
-        [5, "Проговорите слова вслух — нажимайте на динамик и повторяйте."]], link: true };
+        [10, "Посмотрите видео-урок недели: " + w[1] + "."],
+        [5, "Послушайте слова недели: нажимайте на динамик и повторяйте вслух."],
+        [5, "Разминка на сайте: угадайте слова на слух."]], warm: true,
+        links: videoLink(wi) ? [["Смотреть видео-урок недели", videoLink(wi)]] : [] };
       case 1: return { title: "Практика правила", steps: [
-        [5, "Карточки Anki."],
-        [10, "Напишите 5 своих предложений по правилу недели."],
-        [5, "Прочитайте их вслух, медленно и чётко."]] };
+        [5, "Разминка на сайте: слова сами повторяются."],
+        [10, "Напишите 5 своих предложений по правилу недели — вставьте в них слова недели."],
+        [5, "Прочитайте их вслух, медленно и чётко."]], warm: true };
       case 2: return { title: "Слушаем", steps: [
-        [5, "Карточки Anki."],
+        [5, "Разминка на сайте: слова сами повторяются."],
         [10, "Слушаем: " + p.listen + "."],
-        [5, "Повторяйте за диктором фразу за фразой (shadowing)."]] };
+        [5, "Повторяйте за диктором фразу за фразой (shadowing)."]], warm: true,
+        links: p.listenUrl ? [["Открыть: " + p.listen.split(":")[0], p.listenUrl]] : [] };
       case 3: return { title: "Читаем", steps: [
-        [5, "Карточки Anki."],
+        [5, "Разминка на сайте: слова сами повторяются."],
         [10, "Читаем: " + p.read + "."],
-        [5, "Выпишите 3 новых слова и добавьте в Anki."]] };
+        [5, "Прочитайте вслух 3 фразы из текста, которые понравились."]], warm: true,
+        links: p.readUrl ? [["Открыть: " + p.read.split(":")[0], p.readUrl]] : (videoLink(wi) ? [["Видео-урок недели", videoLink(wi)]] : []) };
       case 4: return { title: "Пишем и говорим", steps: [
-        [5, "Карточки Anki."],
+        [5, "Разминка на сайте: слова сами повторяются."],
         [10, w[4] + "."],
-        [5, "Прочитайте текст на диктофон и послушайте себя."]] };
+        [5, "Прочитайте текст на диктофон и послушайте себя."]], warm: true };
       default: return { title: "Вместе", steps: [
         [20, w[5] + ". Только по-португальски, подглядывать в слова недели можно."]], together: true };
     }
@@ -707,7 +722,8 @@ details.week.current { border-color: var(--pink); }
       '<span class="streak">' + (st ? "Серия: " + st + " дн." : "Начните серию сегодня") + '</span></div>';
     if (doneToday) html += '<p class="tip">Сегодня уже сделано занятий: ' + doneToday + '. Можно взять следующее или отдохнуть — на сегодня норма выполнена.</p>';
     html += '<ol class="steps">' + ds.steps.map(s => '<li><span class="min">' + s[0] + '<span>мин</span></span><span>' + esc(s[1]) + '</span></li>').join("") + '</ol>';
-    if (ds.link) html += '<p><a href="' + ytLink(w[2]) + '" target="_blank" rel="noopener">Найти урок на YouTube: «' + esc(w[2]) + '»</a></p>';
+    (ds.links || []).forEach(l => { html += '<p><a class="golink" href="' + esc(l[1]) + '" target="_blank" rel="noopener">▶ ' + esc(l[0]) + '</a></p>'; });
+    if (ds.warm) html += '<div id="warm">' + warmHTML(who, wi) + '</div>';
     html += '<div><span class="eyebrow">Слова недели</span></div><div class="words">' + words(wi).map((x, i) =>
       '<div class="word"><button type="button" class="say" data-say="' + esc(x.pt) + '" aria-label="Послушать ' + esc(x.pt) + '">' + SPK + '</button><div><b>' + esc(x.pt) + '</b><small>' + esc(x.ru) + '</small></div></div>').join("") + '</div>';
     if (ds.together) html += '<p class="tip">Суббота — занятие вдвоём. Отметьте его каждый в своём профиле.</p>';
@@ -934,6 +950,69 @@ details.week.current { border-color: var(--pink); }
 
   function render() { renderWho(); renderToday(); renderPlan(); if (!$("view-together").hidden && !G.game) renderTogether(); paintBirds(); }
   renderDayFact();
+
+
+  // ---------- warm-up: words repeat by themselves ----------
+  // 8 quick questions: this week's words plus older ones. Words you missed come back more often.
+  // Mistakes are kept only on this phone (localStorage "pt-miss"); they never touch progress.
+  function readMiss() { try { return JSON.parse(localStorage.getItem("pt-miss") || "{}") || {}; } catch (e) { return {}; } }
+  function writeMiss(m) { try { localStorage.setItem("pt-miss", JSON.stringify(m)); } catch (e) {} }
+  let WARM = null;
+  function warmStart(who, wi) {
+    const miss = readMiss()[who] || {};
+    const cur = words(wi).map(x => ({ pt: x.pt, ru: x.ru, wi }));
+    const old = [];
+    for (let i = 0; i < wi; i++) words(i).forEach(x => old.push({ pt: x.pt, ru: x.ru, wi: i }));
+    const oldPick = old.map(x => ({ x, w: (miss[x.pt] ? 3 + miss[x.pt] : 0) + 2 / (wi - x.wi) + Math.random() }))
+      .sort((a, b) => b.w - a.w).slice(0, 4).map(o => o.x);
+    const qs = shuffle(pick(cur, old.length ? 4 : 6).concat(oldPick));
+    WARM = { who, wi, qs, i: 0, score: 0, missed: [], all: cur.concat(old), cur: null };
+    warmQuestion();
+  }
+  function warmQuestion() {
+    const g = WARM, word = g.qs[g.i];
+    const dir = g.i % 2 ? "ru" : "pt"; // what is shown; answer is the other side
+    const field = dir === "pt" ? "ru" : "pt";
+    const opts = [word[field]];
+    for (const o of shuffle(g.all)) { if (opts.length >= 4) break; if (!opts.includes(o[field])) opts.push(o[field]); }
+    g.cur = { word, dir, field, opts: shuffle(opts), picked: null };
+    if (dir === "pt") speak(word.pt);
+  }
+  function warmHTML(who, wi) {
+    const g = WARM;
+    if (!g || g.who !== who || g.wi !== wi) return '<div class="warm"><div><span class="eyebrow">Разминка · 2–3 минуты</span><p>Слушаете слово и выбираете перевод. Слова недели и старые слова повторяются сами — ничего записывать не нужно.</p></div><button type="button" class="play" data-wact="start">Начать разминку</button></div>';
+    if (g.i >= g.qs.length) {
+      let h = '<div class="warm"><span class="eyebrow">Разминка готова</span><div class="turn">' + g.score + ' из ' + g.qs.length + (g.score === g.qs.length ? " — muito bem!" : "") + '</div>';
+      if (g.missed.length) h += '<p class="muted">Эти слова вернутся в следующих разминках, пока не запомнятся:</p><div class="words">' + g.missed.map(x => '<div class="word">' + sayBtn(x.pt) + '<div><b>' + esc(x.pt) + '</b><small>' + esc(x.ru) + '</small></div></div>').join("") + '</div>';
+      return h + '<div class="row"><button type="button" class="ghost" data-wact="start">Ещё раз</button></div></div>';
+    }
+    const c = g.cur;
+    let h = '<div class="warm"><div class="row" style="justify-content:space-between"><span class="eyebrow">' + (c.dir === "pt" ? "Что это значит?" : "Как это по-португальски?") + '</span><span class="score">' + (g.i + 1) + ' из ' + g.qs.length + '</span></div>';
+    h += '<div class="big-word">' + (c.dir === "pt" ? sayBtn(c.word.pt) + '<span>' + esc(c.word.pt) + '</span>' : '<span>' + esc(c.word.ru) + '</span>') + '</div>';
+    h += '<div class="opts">' + c.opts.map((o, i) => {
+      let cls = "opt";
+      if (c.picked !== null) { if (o === c.word[c.field]) cls += " right"; else if (i === c.picked) cls += " wrong"; }
+      return '<button type="button" class="' + cls + '" data-wact="answer" data-i="' + i + '"' + (c.picked !== null ? " disabled" : "") + '>' + esc(o) + '</button>';
+    }).join("") + '</div>';
+    if (c.picked !== null) h += '<p>' + (c.opts[c.picked] === c.word[c.field] ? "Верно! " : "Почти. ") + '<b>' + esc(c.word.pt) + '</b> — ' + esc(c.word.ru) + '</p><button type="button" class="play" data-wact="next">Дальше</button>';
+    return h + '</div>';
+  }
+  $("today").addEventListener("click", e => {
+    const b = e.target.closest("[data-wact]"); if (!b) return;
+    const act = b.dataset.wact, nd = nextDay(state.who);
+    if (act === "start" && nd) warmStart(state.who, nd[0]);
+    const g = WARM; if (!g) return;
+    if (act === "answer" && g.cur.picked === null) {
+      const c = g.cur; c.picked = +b.dataset.i;
+      const all = readMiss(), m = all[g.who] || (all[g.who] = {});
+      if (c.opts[c.picked] === c.word[c.field]) { g.score++; if (m[c.word.pt]) { m[c.word.pt]--; if (!m[c.word.pt]) delete m[c.word.pt]; } }
+      else { g.missed.push(c.word); m[c.word.pt] = Math.min((m[c.word.pt] || 0) + 1, 5); }
+      writeMiss(all);
+      if (c.dir === "ru") speak(c.word.pt);
+    }
+    if (act === "next") { g.i++; if (g.i < g.qs.length) warmQuestion(); }
+    const box = $("warm"); if (box) box.innerHTML = warmHTML(g.who, g.wi);
+  });
 
   // ---------- events ----------
   document.addEventListener("click", e => {
